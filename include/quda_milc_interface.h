@@ -49,6 +49,9 @@ extern "C" {
                         HISQ fermions since the tadpole factor is
                         baked into the links during their construction */
     double naik_epsilon; /** Naik epsilon parameter (HISQ fermions only).*/
+
+    //QudaEigParam *eig_param; /** To pass deflation-related stuff like eigenvector filename **/
+    QudaEigParam eig_param; /** To pass deflation-related stuff like eigenvector filename **/
   } QudaInvertArgs_t;
 
   /**
@@ -77,7 +80,6 @@ extern "C" {
     char *vec_outfile;
 
   } QudaEigArgs_t;
-
 
   /**
    * Parameters related to problem size and machine topology.
