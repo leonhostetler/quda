@@ -1191,6 +1191,28 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
 
   invertParam.eig_param = local_parity == QUDA_EVEN_PARITY ? &inv_args.eig_param : nullptr; 
 
+  // this should be passed in from MILC I think?  Set to false when we
+  // are doing the last solve, that the eigenspace is cleanedup
+  // (deallocated)
+  bool preserve_deflation_space = true;
+
+  // this should be passed in from MILC I think?  Do we need to
+  // recompute the eigenvalues?  E.g., has the mass changed?
+  // Alternatively we could cache the mass from the last call and use
+  // that to determine if we preserve the evals or not
+  bool preserve_evalues = true;
+
+  static void* deflation_space = nullptr;
+  static bool deflation_init = false;
+  if (invertParam.eig_param && preserve_deflation_space) {
+    inv_args.eig_param.preserve_deflation = QUDA_BOOLEAN_TRUE;
+    if (deflation_init) {
+      if (!deflation_space) errorQuda("Unexpected nullptr for preserved deflation space");
+      inv_args.eig_param.preserve_deflation_space = deflation_space;
+    }
+    inv_args.eig_param.preserve_evals = preserve_evalues ? QUDA_BOOLEAN_TRUE : QUDA_BOOLEAN_FALSE;
+  }
+
   ColorSpinorParam csParam;
   setColorSpinorParams(localDim, host_precision, &csParam);
 
@@ -1208,6 +1230,12 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
   int quark_offset = getColorVectorOffset(local_parity, false, localDim) * host_precision;
 
   invertQuda(static_cast<char *>(solution) + quark_offset, static_cast<char *>(source) + quark_offset, &invertParam);
+
+  if (invertParam.eig_param && preserve_deflation_space) {
+    deflation_space = inv_args.eig_param.preserve_deflation_space;
+    deflation_init = true; // signal that we have deflation space preserved
+  }
+
 
   // return the number of iterations taken by the inverter
   *num_iters = invertParam.iter;
