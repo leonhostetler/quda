@@ -1189,7 +1189,7 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
                   target_fermilab_residual, inv_args.max_iter, reliable_delta, local_parity, verbosity,
                   QUDA_CG_INVERTER, &invertParam);
 
-  invertParam.eig_param = &inv_args.eig_param;
+  invertParam.eig_param = local_parity == QUDA_EVEN_PARITY ? &inv_args.eig_param : nullptr; 
 
   ColorSpinorParam csParam;
   setColorSpinorParams(localDim, host_precision, &csParam);
