@@ -1189,7 +1189,7 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
                   target_fermilab_residual, inv_args.max_iter, reliable_delta, local_parity, verbosity,
                   QUDA_CG_INVERTER, &invertParam);
 
-  invertParam.eig_param = local_parity == QUDA_EVEN_PARITY ? &inv_args.eig_param : nullptr; 
+  invertParam.eig_param = (local_parity == QUDA_EVEN_PARITY)&&(inv_args.eig_param.n_conv>0) ? &inv_args.eig_param : nullptr; 
 
   // this should be passed in from MILC I think?  Set to false when we
   // are doing the last solve, that the eigenspace is cleanedup
