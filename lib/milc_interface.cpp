@@ -1142,7 +1142,10 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
                 const void *const longlink, void *source, void *solution, double *const final_residual,
                 double *const final_fermilab_residual, int *num_iters)
 {
-  static const QudaVerbosity verbosity = getVerbosity();
+  //static const QudaVerbosity verbosity = getVerbosity();
+  
+  static const QudaVerbosity verbosity = QUDA_VERBOSE;
+  
   qudamilc_called<true>(__func__, verbosity);
 
   if (target_fermilab_residual == 0 && target_residual == 0) errorQuda("qudaInvert: requesting zero residual\n");
