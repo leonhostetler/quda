@@ -52,6 +52,11 @@ extern "C" {
 
     //QudaEigParam *eig_param; /** To pass deflation-related stuff like eigenvector filename **/
     QudaEigParam eig_param; /** To pass deflation-related stuff like eigenvector filename **/
+
+    // Parameters for the deflated CG
+    double reliable_delta;
+    double tol_restart;
+
   } QudaInvertArgs_t;
 
   /**
