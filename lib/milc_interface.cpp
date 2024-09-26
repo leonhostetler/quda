@@ -1186,7 +1186,8 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
   QudaInvertParam invertParam = newQudaInvertParam();
 
   QudaParity local_parity = inv_args.evenodd;
-  const double reliable_delta = inv_args.reliable_delta;
+  //const double reliable_delta = inv_args.reliable_delta;
+  const double reliable_delta = 1e-1;
 
   setInvertParams(host_precision, device_precision, device_precision_sloppy, mass, target_residual,
                   target_fermilab_residual, inv_args.max_iter, reliable_delta, local_parity, verbosity,
