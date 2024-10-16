@@ -270,6 +270,7 @@ namespace quda
     int threadDimMapLower[4];
     int threadDimMapUpper[4];
 
+    int_fastdiv n_src;
     int_fastdiv Ls;
 
     // these are set with symmetric preconditioned twisted-mass dagger
@@ -328,6 +329,7 @@ namespace quda
       exterior_threads(0),
       threadDimMapLower {},
       threadDimMapUpper {},
+      n_src(in.size()),
       Ls(halo.X(4) / in.size()),
       twist_a(0.0),
       twist_b(0.0),

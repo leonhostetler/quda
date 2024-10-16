@@ -37,7 +37,6 @@ namespace quda
     using GL =
         typename gauge_mapper<Float, reconstruct_l, 18, QUDA_STAGGERED_PHASE_NO, gauge_direct_load, ghost, use_inphase>::type;
 
-    const int_fastdiv n_src;
     F out[MAX_MULTI_RHS];  /** output vector field */
     F in[MAX_MULTI_RHS];   /** input vector field */
     const Ghost halo_pack; /** accessor for writing the halo */
@@ -59,7 +58,6 @@ namespace quda
                  cvector_ref<const ColorSpinorField> &x, int parity, bool dagger, const int *comm_override) :
       DslashArg<Float, nDim, n_src_tile>(out, in, halo, U, x, parity, dagger, a == 0.0 ? false : true,
                                          improved_ ? 3 : 1, spin_project, comm_override),
-      n_src(out.size()),
       halo_pack(halo, improved_ ? 3 : 1),
       halo(halo, improved_ ? 3 : 1),
       U(U),
