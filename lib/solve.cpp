@@ -395,6 +395,18 @@ namespace quda
       x[0] = ColorSpinorField(cudaParam);
     }
 
+    if (param.use_init_guess == QUDA_USE_INIT_GUESS_YES && !param.chrono_use_resident) { // download initial guess
+      // initial guess only supported for single-pass solvers
+      if ((param.solution_type == QUDA_MATDAG_MAT_SOLUTION || param.solution_type == QUDA_MATPCDAG_MATPC_SOLUTION)
+          && (param.solve_type == QUDA_DIRECT_SOLVE || param.solve_type == QUDA_DIRECT_PC_SOLVE)) {
+        errorQuda("Initial guess not supported for two-pass solver");
+      }
+
+      blas::copy(x, h_x); // solution
+    } else {              // zero initial guess
+      blas::zero(x);
+    }
+
     solve(x, b, *dirac, *diracSloppy, *diracPre, *diracEig, param);
 
     if (!param.make_resident_solution) blas::copy(h_x, x);
