@@ -197,7 +197,7 @@ std::vector<double> eigensolve(test_t test_param)
     quda::host_timer_t host_timer;
     host_timer.start(); // start the timer
 
-    QudaGaugeObservableParam *obs_param = new QudaGaugeObservableParam[gauge_smear_steps / measurement_interval + 1];
+    std::vector<QudaGaugeObservableParam> obs_param(gauge_smear_steps / measurement_interval + 1);
     for (int i = 0; i < gauge_smear_steps / measurement_interval + 1; i++) {
       obs_param[i] = newQudaGaugeObservableParam();
       obs_param[i].compute_plaquette = QUDA_BOOLEAN_TRUE;
@@ -208,23 +208,13 @@ std::vector<double> eigensolve(test_t test_param)
     // We here set all the problem parameters for all possible smearing types.
     QudaGaugeSmearParam smear_param = newQudaGaugeSmearParam();
     setGaugeSmearParam(smear_param);
-    smear_param.smear_type = gauge_smear_type;
-    smear_param.n_steps = gauge_smear_steps;
-    smear_param.meas_interval = measurement_interval;
-    smear_param.alpha = gauge_smear_alpha;
-    smear_param.rho = gauge_smear_rho;
-    smear_param.epsilon = gauge_smear_epsilon;
-    smear_param.alpha1 = gauge_smear_alpha1;
-    smear_param.alpha2 = gauge_smear_alpha2;
-    smear_param.alpha3 = gauge_smear_alpha3;
-    smear_param.dir_ignore = gauge_smear_dir_ignore;
 
     switch (smear_param.smear_type) {
     case QUDA_GAUGE_SMEAR_APE:
     case QUDA_GAUGE_SMEAR_STOUT:
     case QUDA_GAUGE_SMEAR_OVRIMP_STOUT:
     case QUDA_GAUGE_SMEAR_HYP: {
-      performGaugeSmearQuda(&smear_param, obs_param);
+      performGaugeSmearQuda(&smear_param, obs_param.data());
       break;
     }
 
@@ -235,7 +225,7 @@ std::vector<double> eigensolve(test_t test_param)
       for (int i = 0; i < gauge_smear_steps / measurement_interval + 1; i++) {
         obs_param[i].compute_plaquette = QUDA_BOOLEAN_TRUE;
       }
-      performWFlowQuda(&smear_param, obs_param);
+      performWFlowQuda(&smear_param, obs_param.data());
       break;
     }
     default: errorQuda("Undefined gauge smear type %d given", smear_param.smear_type);

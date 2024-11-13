@@ -30,7 +30,7 @@
  * @param[in] daggerBit Perform the ordinary dslash (0) or Hermitian conjugate (1)
  * @param[in] dslash_type The type of Dslash operation
  * @param[in] laplace3D Whether we applying the 3-d laplace operator
- * (in the case of dslash_type being QUDA_LAPLACE_DSLASH
+ * (in the case of dslash_type being QUDA_LAPLACE_DSLASH)
  */
 template <typename real_t>
 void staggeredDslashReference(real_t *res, const real_t *const *fatlink, const real_t *const *longlink,
@@ -175,7 +175,7 @@ void stag_mat(ColorSpinorField &out, const GaugeField &fat_link, const GaugeFiel
   stag_dslash(out.Odd(), fat_link, long_link, in.Even(), QUDA_ODD_PARITY, 1 - daggerBit, dslash_type, laplace3D);
 
   if (dslash_type == QUDA_LAPLACE_DSLASH) {
-    double kappa = 1.0 / ((laplace3D == 3 ? 6 : 8) + mass);
+    double kappa = 1.0 / ((laplace3D < 4 ? 6 : 8) + mass);
     xpay(in.data(), kappa, out.data(), out.Length(), out.Precision());
   } else {
     axpy(2 * mass, in.data(), out.data(), out.Length(), out.Precision());

@@ -5,12 +5,16 @@
 
 void setGaugeSmearParam(QudaGaugeSmearParam &smear_param)
 {
+  smear_param.smear_type = gauge_smear_type;
   smear_param.alpha = gauge_smear_alpha;
   smear_param.rho = gauge_smear_rho;
   smear_param.epsilon = gauge_smear_epsilon;
   smear_param.n_steps = gauge_smear_steps;
   smear_param.meas_interval = measurement_interval;
-  smear_param.smear_type = gauge_smear_type;
+  smear_param.alpha1 = gauge_smear_alpha1;
+  smear_param.alpha2 = gauge_smear_alpha2;
+  smear_param.alpha3 = gauge_smear_alpha3;
+  smear_param.dir_ignore = gauge_smear_dir_ignore;
   smear_param.struct_size = sizeof(smear_param);
 }
 
