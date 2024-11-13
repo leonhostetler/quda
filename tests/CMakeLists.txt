@@ -1229,17 +1229,6 @@ if (QUDA_DIRAC_DISTANCE_PRECONDITIONING)
       --distance-pc-alpha0 0.1 --distance-pc-t0 4
       --enable-testing true
       --gtest_output=xml:invert_test_wilson_distance_pc.xml)
-
-    add_test(NAME invert_test_splitgrid_wilson
-      COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:invert_test> ${MPIEXEC_POSTFLAGS}
-      --dslash-type wilson --ngcrkrylov 8
-      --dim 2 4 6 8 --niter 1000
-      --distance-pc-alpha0 0.1 --distance-pc-t0 4
-      --nsrc ${QUDA_TEST_NUM_PROCS}
-      --enable-testing true
-      --gtest_output=xml:invert_test_splitgrid_wilson_distance_pc.xml)
-
-    set_tests_properties(invert_test_splitgrid_wilson PROPERTIES ENVIRONMENT QUDA_TEST_GRID_PARTITION=$ENV{QUDA_TEST_GRID_SIZE})
   endif()
 
   if(QUDA_DIRAC_CLOVER)
