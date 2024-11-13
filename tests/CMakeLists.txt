@@ -1013,7 +1013,7 @@ if(QUDA_DIRAC_WILSON)
     COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:invert_test> ${MPIEXEC_POSTFLAGS}
     --dslash-type wilson --ngcrkrylov 8
     --dim 2 4 6 8 --niter 1000
-    --nsrc ${QUDA_TEST_NUM_PROCS}
+    --nsrc ${QUDA_TEST_NUM_PROCS} --nsrc-tile ${QUDA_TEST_NUM_PROCS}
     --enable-testing true
     --gtest_output=xml:invert_test_splitgrid_wilson.xml)
 
@@ -1186,7 +1186,7 @@ foreach(prec IN LISTS TEST_PRECS)
       COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:staggered_invert_test> ${MPIEXEC_POSTFLAGS}
       --dslash-type staggered --ngcrkrylov 8 --compute-fat-long true
       --dim 2 4 6 8 --prec ${prec} --tol ${tol} --tolhq ${tol} --niter 1000
-      --nsrc ${QUDA_TEST_NUM_PROCS}
+      --nsrc ${QUDA_TEST_NUM_PROCS} --nsrc-tile ${QUDA_TEST_NUM_PROCS}
       --enable-testing true
       --gtest_output=xml:invert_test_splitgrid_staggered_${prec}.xml)
 
