@@ -32,7 +32,7 @@ namespace quda
         if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
 
         // Check slice value
-        if (t_slice >= y.X()[3]) errorQuda("Unexpected slice %d", t_slice);
+        if (t_slice < 0 || t_slice >= y.X()[3]) errorQuda("Unexpected slice %d", t_slice);
 
         strcat(aux, type == SWAP_3D ? ",swap_3d" : type == COPY_TO_3D ? ",to_3d" : ",from_3d");
         apply(device::get_default_stream());
@@ -72,14 +72,14 @@ namespace quda
 
     template <typename Float, int nColor> class axpby3D : TunableKernel2D
     {
-      ColorSpinorField &x;
+      const ColorSpinorField &x;
       ColorSpinorField &y;
       const std::vector<double> &a;
       const std::vector<double> &b;
       unsigned int minThreads() const override { return x.VolumeCB(); }
 
     public:
-      axpby3D(ColorSpinorField &x, ColorSpinorField &y, const std::vector<double> &a, const std::vector<double> &b) :
+      axpby3D(const ColorSpinorField &x, ColorSpinorField &y, const std::vector<double> &a, const std::vector<double> &b) :
         TunableKernel2D(x, x.SiteSubset()), x(x), y(y), a(a), b(b)
       {
         apply(device::get_default_stream());
@@ -97,7 +97,7 @@ namespace quda
       long long bytes() const override { return x.Bytes() + 2 * y.Bytes(); }
     };
 
-    void axpby(std::vector<double> &a, ColorSpinorField &x, std::vector<double> &b, ColorSpinorField &y)
+    void axpby(const std::vector<double> &a, const ColorSpinorField &x, const std::vector<double> &b, ColorSpinorField &y)
     {
       checkPrecision(x, y);
 
@@ -115,7 +115,7 @@ namespace quda
       instantiate<axpby3D>(x, y, a, b);
     }
 
-    void ax(std::vector<double> &a, ColorSpinorField &x)
+    void ax(const std::vector<double> &a, ColorSpinorField &x)
     {
       std::vector<double> zeros(a.size(), 0.0);
       axpby(a, x, zeros, x);
@@ -123,14 +123,14 @@ namespace quda
 
     template <typename Float, int nColor> class caxpby3D : TunableKernel2D
     {
-      ColorSpinorField &x;
+      const ColorSpinorField &x;
       ColorSpinorField &y;
       const std::vector<Complex> &a;
       const std::vector<Complex> &b;
       unsigned int minThreads() const override { return x.VolumeCB(); }
 
     public:
-      caxpby3D(ColorSpinorField &x, ColorSpinorField &y, const std::vector<Complex> &a, const std::vector<Complex> &b) :
+      caxpby3D(const ColorSpinorField &x, ColorSpinorField &y, const std::vector<Complex> &a, const std::vector<Complex> &b) :
         TunableKernel2D(x, x.SiteSubset()), x(x), y(y), a(a), b(b)
       {
         apply(device::get_default_stream());
@@ -148,7 +148,7 @@ namespace quda
       long long bytes() const override { return x.Bytes() + 2 * y.Bytes(); }
     };
 
-    void caxpby(std::vector<Complex> &a, ColorSpinorField &x, std::vector<Complex> &b, ColorSpinorField &y)
+    void caxpby(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y)
     {
       checkPrecision(x, y);
 

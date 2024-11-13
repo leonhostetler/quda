@@ -411,9 +411,7 @@ namespace quda
     getProfile().TPSTART(QUDA_PROFILE_EIGEN);
 
     // Loop over the 3D problems
-#ifdef _OPENMP
 #pragma omp parallel for
-#endif
     for (int t = 0; t < ortho_dim_size; t++){
       if (!converged_3D[t]){
 
@@ -563,7 +561,8 @@ namespace quda
 
   void TRLM3D::prepareInitialGuess3D(std::vector<ColorSpinorField> &kSpace, int ortho_dim_size)
   {
-    if (sqrt(blas::norm2(kSpace[0])) == 0.0) {
+    auto nrm = blas::norm2(kSpace[0]);
+    if (!std::isfinite(nrm) || nrm == 0.0) {
       RNG rng(kSpace[0], 1234);
       spinorNoise(kSpace[0], rng, QUDA_NOISE_UNIFORM);
     }
