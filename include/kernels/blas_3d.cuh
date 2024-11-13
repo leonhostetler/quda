@@ -6,7 +6,6 @@
 #include <quda_matrix.h>
 #include <matrix_field.h>
 #include <kernel.h>
-//#include <kernels/contraction_helper.cuh>
 
 namespace quda
 {
@@ -179,7 +178,7 @@ namespace quda
     complex<real> b[MAX_ORTHO_DIM];
     F y;
 
-    caxpby3dArg(const std::vector<Complex> &a, ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y) :
+    caxpby3dArg(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y) :
       baseArg(dim3(x.VolumeCB(), x.SiteSubset(), 1), x), x(x), y(y)
     {
       if (x.X(3) > MAX_ORTHO_DIM) errorQuda("Orthogonal dimension %d exceeds maximum %d", x.X(3), MAX_ORTHO_DIM);
@@ -242,20 +241,6 @@ namespace quda
 
     __device__ __host__ double init() const { return double(); }
   };
-
-  template <int reduction_dim, class T> __device__ int idx_from_t_xyz(int t, int xyz, T X[4])
-  {
-    int x[4];
-#pragma unroll
-    for (int d = 0; d < 4; d++) {
-      if (d != reduction_dim) {
-        x[d] = xyz % X[d];
-        xyz = xyz / X[d];
-      }
-    }
-    x[reduction_dim] = t;
-    return (((x[3] * X[2] + x[2]) * X[1] + x[1]) * X[0] + x[0]);
-  }
 
   template <typename Arg> struct reDotProduct3d : plus<double> {
     using reduce_t = double;
