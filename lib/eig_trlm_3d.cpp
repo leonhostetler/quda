@@ -116,7 +116,9 @@ namespace quda
     while (restart_iter < max_restarts && !converged) {
 
       // Get min step
-      int step_min = getArrayMinMax3D<MIN>(num_locked_3D);
+      int step_min = *std::min_element(num_locked_3D.begin(), num_locked_3D.end());
+      comm_allreduce_min(step_min);
+
       for (int step = step_min; step < n_kr; step++) lanczosStep3D(kSpace, step);
       iter += (n_kr - step_min);
 
@@ -595,7 +597,9 @@ namespace quda
     // Compute spectral radius estimate
     std::vector<double> inner_products(ortho_dim_size, 0.0);
     blas3d::reDotProduct(inner_products, out, in);    
-    double result = getArrayMinMax3D<MAX>(inner_products);
+
+    auto result = *std::max_element(inner_products.begin(), inner_products.end());
+    comm_allreduce_max(result);
     logQuda(QUDA_VERBOSE, "Chebyshev max %e\n", result);
     
     // Increase final result by 10% for safety
@@ -655,23 +659,6 @@ namespace quda
         }
       }
     }
-  }
-
-  template <extremumType min_max, typename T>
-  T TRLM3D::getArrayMinMax3D(const std::vector<T> &array)
-  {
-    T ret_val;
-    if constexpr (min_max == MIN) {
-      ret_val = *std::min_element(array.begin(), array.end());
-      comm_allreduce_min(ret_val);
-    } else if constexpr (min_max == MAX) {
-      ret_val = *std::max_element(array.begin(), array.end());
-      comm_allreduce_max(ret_val);
-    } else {
-      errorQuda("Unknown extremumType %d", min_max);
-    }
-    
-    return ret_val;
   }
 
 } // namespace quda
