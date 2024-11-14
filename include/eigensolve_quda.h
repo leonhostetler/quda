@@ -468,7 +468,7 @@ namespace quda
     /**
        @return Whether the solver is only for Hermitian systems
     */
-    virtual bool hermitian() { return true; } /** TRLM3D is only for Hermitian systems */
+    virtual bool hermitian() override { return true; } /** TRLM3D is only for Hermitian systems */
 
     // Variable size matrix (for the 3D problem)
     std::vector<std::vector<double>> ritz_mat_3D;
@@ -499,7 +499,7 @@ namespace quda
        @param[in] kSpace Krylov vector space
        @param[in] evals Computed eigenvalues
     */
-    void operator()(std::vector<ColorSpinorField> &kSpace, std::vector<Complex> &evals);
+    void operator()(std::vector<ColorSpinorField> &kSpace, std::vector<Complex> &evals) override;
 
     /**
        @brief Lanczos step: extends the Krylov space.
