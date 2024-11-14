@@ -228,9 +228,10 @@ namespace quda
       }
 
       if (getVerbosity() >= QUDA_VERBOSE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
-        printf("iter = %d rank = %d converged = ", restart_iter + 1, comm_rank_global());
-        for (int t = 0; t < ortho_dim_size; t++) printf("%d", (int)converged_3D[t]);
-        printf(" min nlock %3d nconv %3d nkeep %3d\n",min_nlock,min_nconv,min_nkeep);
+        std::stringstream converged;
+        std::copy(converged_3D.begin(), converged_3D.end(), std::ostream_iterator<int>(converged, ""));
+        printf("iter = %d rank = %d converged = %s min nlock %3d nconv %3d nkeep %3d\n", restart_iter + 1,
+               comm_rank_global(), converged.str().c_str(), min_nlock, min_nconv, min_nkeep);
       }
 
       if (all_converged) {
@@ -252,20 +253,22 @@ namespace quda
                   n_conv, n_ev, n_kr, max_restarts);
       } else {
         warningQuda("TRLM failed to compute the requested %d vectors with a %d search space and %d Krylov space in %d "
-                    "restart steps. Continuing with current lanczos factorisation.",
+                    "restart steps. Continuing with current Lanczos factorisation.",
                     n_conv, n_ev, n_kr, max_restarts);
         // Compute eigenvalues
         computeEvals(kSpace, evals);
       }
     } else {
-      logQuda(QUDA_SUMMARIZE, "TRLM computed the requested %d vectors in %d restart steps and %d OP*x operations.\n",
-              n_conv, restart_iter, iter);
+      if (getVerbosity() >= QUDA_SUMMARIZE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
+        printf("TRLM (rank = %d) computed the requested %d vectors in %d restart steps and %d OP*x operations\n",
+               comm_rank_global(), n_conv, restart_iter, iter);
+      }
 
       // Dump all Ritz values and residua if using Chebyshev
       if (eig_param->use_poly_acc) {
         for (int t = 0; t < ortho_dim_size; t++) {
           for (int i = 0; i < n_conv; i++) {
-            logQuda(QUDA_SUMMARIZE, "RitzValue[%d][%04d]: (%+.16e, %+.16e) residual %.16e\n", t, i, alpha_3D[t][i], 0.0,
+            logQuda(QUDA_VERBOSE, "RitzValue[%d][%04d]: (%+.16e, %+.16e) residual %.16e\n", t, i, alpha_3D[t][i], 0.0,
                     residua_3D[t][i]);
           }
         }
