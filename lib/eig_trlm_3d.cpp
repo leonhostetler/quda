@@ -84,7 +84,7 @@ namespace quda
     // Check to see if we are loading eigenvectors
     if (strcmp(eig_param->vec_infile, "") != 0) {
       printfQuda("Loading evecs from file name %s\n", eig_param->vec_infile);
-      loadFromFile3D(mat, kSpace, evals);
+      loadFromFile(kSpace, evals);
       return;
     }
 
@@ -97,7 +97,7 @@ namespace quda
     prepareKrylovSpace(kSpace, evals);
 
     // Check for Chebyshev maximum estimation
-    checkChebyOpMax3D(mat, kSpace);
+    checkChebyOpMax(kSpace);
 
     // Convergence and locking criteria
     std::vector<double> mat_norm_3D(ortho_dim_size, 0.0);
@@ -253,7 +253,7 @@ namespace quda
                     "restart steps. Continuing with current lanczos factorisation.",
                     n_conv, n_ev, n_kr, max_restarts);
         // Compute eigenvalues
-        computeEvals3D(mat, kSpace, evals);
+        computeEvals(kSpace, evals);
       }
     } else {
       logQuda(QUDA_SUMMARIZE, "TRLM computed the requested %d vectors in %d restart steps and %d OP*x operations.\n",
@@ -270,7 +270,7 @@ namespace quda
       }
 
       // Compute eigenvalues
-      computeEvals3D(mat, kSpace, evals);
+      computeEvals(kSpace, evals);
     }
 
     push_communicator(default_comm_key);
@@ -574,7 +574,7 @@ namespace quda
     blas3d::axpby(norms, kSpace[0], zeros, kSpace[0]);
   }
 
-  double TRLM3D::estimateChebyOpMax3D(const DiracMatrix &mat, ColorSpinorField &out, ColorSpinorField &in)
+  double TRLM3D::estimateChebyOpMax(ColorSpinorField &out, ColorSpinorField &in)
   {
     RNG rng(in, 1234);
     spinorNoise(in, rng, QUDA_NOISE_UNIFORM);
@@ -602,18 +602,9 @@ namespace quda
     return result * 1.10;
   }
 
-  void TRLM3D::checkChebyOpMax3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &kSpace)
+  void TRLM3D::computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals, int size)
   {
-    if (eig_param->use_poly_acc && eig_param->a_max <= 0.0) {
-      // Use part of the kSpace as temps
-      eig_param->a_max = estimateChebyOpMax3D(mat, kSpace[block_size + 2], kSpace[block_size + 1]);
-      logQuda(QUDA_SUMMARIZE, "Chebyshev maximum estimate: %e\n", eig_param->a_max);
-    }
-  }
-
-  void TRLM3D::computeEvals3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals,
-                              int size)
-  {
+    if (size == 0) size = n_conv;
     if (size > (int)evecs.size())
       errorQuda("Requesting %d eigenvectors with only storage allocated for %lu", size, evecs.size());
     if (size > (int)evals.size())
@@ -664,20 +655,6 @@ namespace quda
         }
       }
     }
-  }
-
-  void TRLM3D::loadFromFile3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &kSpace, std::vector<Complex> &evals)
-  {
-    // Set suggested parity of fields
-    const QudaParity mat_parity = impliedParityFromMatPC(mat.getMatPCType());
-    for (int i = 0; i < n_conv; i++) { kSpace[i].setSuggestedParity(mat_parity); }
-
-    // load the vectors
-    VectorIO io(eig_param->vec_infile, eig_param->io_parity_inflate == QUDA_BOOLEAN_TRUE);
-    io.load({kSpace.begin(), kSpace.begin() + n_conv});
-
-    // Error estimates (residua) given by ||A*vec - lambda*vec||
-    computeEvals3D(mat, kSpace, evals);
   }
 
   template <extremumType min_max, typename T>

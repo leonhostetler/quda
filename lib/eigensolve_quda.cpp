@@ -584,6 +584,7 @@ namespace quda
   void EigenSolver::computeEvals(std::vector<ColorSpinorField> &evecs,
                                  std::vector<Complex> &evals, int size)
   {
+    if (size == 0) size = n_conv;
     auto batch_size = eig_param->compute_evals_batch_size;
 
     if (size > static_cast<int>(evecs.size()))

@@ -151,7 +151,7 @@ namespace quda
        @param[in] out Output spinor
        @param[in] in Input spinor
     */
-    double estimateChebyOpMax(ColorSpinorField &out, ColorSpinorField &in);
+    virtual double estimateChebyOpMax(ColorSpinorField &out, ColorSpinorField &in);
 
     /**
        @brief Orthogonalise input vectors r against
@@ -269,19 +269,7 @@ namespace quda
        @param[in,out] evals The eigenvalues
        @param[in] size The number of eigenvalues to compute
     */
-    void computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals,
-                      int size);
-
-    /**
-       @brief Compute eigenvalues and their residiua.  This variant compute the number of converged eigenvalues.
-       @param[in] mat Matrix operator
-       @param[in] evecs The eigenvectors
-       @param[in,out] evals The eigenvalues
-    */
-    void computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals)
-    {
-      computeEvals(evecs, evals, n_conv);
-    }
+    virtual void computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals, int size = 0);
 
     /**
        @brief Load and check eigenpairs from file
@@ -561,43 +549,15 @@ namespace quda
        @param[in] out Output spinor
        @param[in] in Input spinor
     */
-    double estimateChebyOpMax3D(const DiracMatrix &mat, ColorSpinorField &out, ColorSpinorField &in);
-
-    /**
-       @brief Check for a maximum of the Chebyshev operator
-       @param[in] mat The problem operator
-       @param[in] kSpace The Krylov space vectors
-    */
-    void checkChebyOpMax3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &kSpace);
+    double estimateChebyOpMax(ColorSpinorField &out, ColorSpinorField &in) override;
 
     /**
        @brief Compute eigenvalues and their residiua
-       @param[in] mat Matrix operator
        @param[in] evecs The eigenvectors
        @param[in,out] evals The eigenvalues
        @param[in] size The number of eigenvalues to compute
     */
-    void computeEvals3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals,
-                        int size);
-
-    /**
-       @brief Compute eigenvalues and their residiua.  This variant compute the number of converged eigenvalues.
-       @param[in] mat Matrix operator
-       @param[in] evecs The eigenvectors
-       @param[in,out] evals The eigenvalues
-    */
-    void computeEvals3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals)
-    {
-      computeEvals3D(mat, evecs, evals, n_conv);
-    }
-
-    /**
-       @brief Load and check eigenpairs from file
-       @param[in] mat Matrix operator
-       @param[in] eig_vecs The eigenvectors to save
-       @param[in] file The filename to save
-    */
-    void loadFromFile3D(const DiracMatrix &mat, std::vector<ColorSpinorField> &eig_vecs, std::vector<Complex> &evals);
+    void computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals, int size = 0) override;
 
     template <extremumType min_max, typename T> T getArrayMinMax3D(const std::vector<T> &array);
   };
