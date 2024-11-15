@@ -25,12 +25,6 @@ namespace quda
       copy3D(ColorSpinorField &y, ColorSpinorField &x, int t_slice, copy3dType type) :
         TunableKernel2D(y, y.SiteSubset()), y(y), x(x), t_slice(t_slice), type(type)
       {
-        // Check spins
-        if (x.Nspin() != y.Nspin()) errorQuda("Unexpected number of spins x=%d y=%d", x.Nspin(), y.Nspin());
-
-        // Check colors
-        if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
-
         // Check slice value
         if (t_slice < 0 || t_slice >= y.X()[3]) errorQuda("Unexpected slice %d", t_slice);
 
@@ -58,6 +52,8 @@ namespace quda
     void copy(const int slice, const copy3dType type, ColorSpinorField &x, ColorSpinorField &y)
     {
       checkPrecision(x, y);
+      checkSpin(x, y);
+      checkColor(x, y);
       // Check orth dim
       if (x.X()[3] != 1) errorQuda("Unexpected dimensions in x[3]=%d", x.X()[3]);
       // We must give a 4D Lattice field as the first argument
@@ -67,6 +63,8 @@ namespace quda
     void swap(int slice, ColorSpinorField &x, ColorSpinorField &y)
     {
       checkPrecision(x, y);
+      checkSpin(x, y);
+      checkColor(x, y);
       instantiate<copy3D>(x, y, slice, SWAP_3D);
     }
 
@@ -100,12 +98,8 @@ namespace quda
     void axpby(const std::vector<double> &a, const ColorSpinorField &x, const std::vector<double> &b, ColorSpinorField &y)
     {
       checkPrecision(x, y);
-
-      // Check spins
-      if (x.Nspin() != y.Nspin()) errorQuda("Unexpected number of spins x=%d y=%d", x.Nspin(), y.Nspin());
-
-      // Check colors
-      if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
+      checkSpin(x, y);
+      checkColor(x, y);
 
       // Check coefficients
       if (a.size() != b.size() && a.size() != (unsigned int)x.X()[3])
@@ -151,12 +145,8 @@ namespace quda
     void caxpby(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y)
     {
       checkPrecision(x, y);
-
-      // Check spins
-      if (x.Nspin() != y.Nspin()) errorQuda("Unexpected number of spins x=%d y=%d", x.Nspin(), y.Nspin());
-
-      // Check colors
-      if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
+      checkSpin(x, y);
+      checkColor(x, y);
 
       // Check coefficients
       if (a.size() != b.size() && a.size() != (unsigned int)x.X()[3])
@@ -192,11 +182,8 @@ namespace quda
 
     void reDotProduct(std::vector<double> &result, const ColorSpinorField &x, const ColorSpinorField &y)
     {
-      // Check spins
-      if (x.Nspin() != y.Nspin()) errorQuda("Unexpected number of spins x=%d y=%d", x.Nspin(), y.Nspin());
-
-      // Check colors
-      if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
+      checkSpin(x, y);
+      checkColor(x, y);
 
       // Check coefficients
       if (result.size() != (unsigned int)x.X()[3])
@@ -232,11 +219,8 @@ namespace quda
 
     void cDotProduct(std::vector<Complex> &result, const ColorSpinorField &x, const ColorSpinorField &y)
     {
-      // Check spins
-      if (x.Nspin() != y.Nspin()) errorQuda("Unexpected number of spins x=%d y=%d", x.Nspin(), y.Nspin());
-
-      // Check colors
-      if (x.Ncolor() != y.Ncolor()) errorQuda("Unexpected number of colors x=%d y=%d", x.Ncolor(), y.Ncolor());
+      checkSpin(x, y);
+      checkColor(x, y);
 
       // Check coefficients
       if (result.size() != (unsigned int)x.X()[3])

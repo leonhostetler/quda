@@ -1057,6 +1057,38 @@ namespace quda
   void spinorDistanceReweight(ColorSpinorField &src, double alpha0, int t0);
 
   /**
+     @brief Helper function for determining if the spin of the fields is the same.
+     @param[in] a Input field
+     @param[in] b Input field
+     @return If spin is unique return the number of spins
+   */
+  inline int Spin_(const char *func, const char *file, int line, const ColorSpinorField &a, const ColorSpinorField &b)
+  {
+    int nSpin = 0;
+    if (a.Nspin() == b.Nspin())
+      nSpin = a.Nspin();
+    else
+      errorQuda("Spin %d %d do not match (%s:%d in %s())", a.Nspin(), b.Nspin(), file, line, func);
+    return nSpin;
+  }
+
+  /**
+     @brief Helper function for determining if the spin of the fields is the same.
+     @param[in] a Input field
+     @param[in] b Input field
+     @param[in] args List of additional fields to check spin on
+     @return If spins is unique return the number of spins
+   */
+  template <typename... Args>
+  inline int Spin_(const char *func, const char *file, int line, const ColorSpinorField &a, const ColorSpinorField &b,
+                   const Args &...args)
+  {
+    return Spin_(func, file, line, a, b) & Spin_(func, file, line, a, args...);
+  }
+
+#define checkSpin(...) Spin_(__func__, __FILE__, __LINE__, __VA_ARGS__)
+
+  /**
      @brief Helper function for determining if the preconditioning
      type of the fields is the same.
      @param[in] a Input field
