@@ -171,7 +171,8 @@ namespace quda
     }
 
     // now merge the maps
-    for (auto i = 0u; i < global_tune_rank.size(); i++) { tunecache.merge(split_tc[i]); }
+    tunecache = split_tc[0];
+    for (auto i = 1u; i < global_tune_rank.size(); i++) { tunecache.merge(split_tc[i]); }
   }
 
   /**
