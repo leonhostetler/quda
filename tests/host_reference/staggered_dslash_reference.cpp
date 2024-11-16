@@ -39,6 +39,9 @@ void staggeredDslashReference(real_t *res, const real_t *const *fatlink, const r
                               const real_t *const *back_nbr_spinor, int oddBit, int daggerBit, QudaDslashType dslash_type,
                               int laplace3D)
 {
+  if (laplace3D < 4 && dslash_type != QUDA_LAPLACE_DSLASH)
+    errorQuda("laplace3D = %d only supported for Laplace dslash (%d requested)", laplace3D, dslash_type);
+
 #pragma omp parallel for
   for (auto i = 0lu; i < Vh * stag_spinor_site_size; i++) res[i] = 0.0;
 
@@ -204,6 +207,7 @@ void stag_matpc(ColorSpinorField &out, const GaugeField &fat_link, const GaugeFi
                 const ColorSpinorField &in, double mass, int, QudaParity parity, QudaDslashType dslash_type,
                 int laplace3D)
 {
+  if (laplace3D < 4) errorQuda("Cannot use 3-d operator with e/o preconditioning");
   checkPrecision(in, fat_link);
 
   // assert we have single-parity spinors
