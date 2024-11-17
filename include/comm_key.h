@@ -20,10 +20,7 @@ namespace quda
 
     constexpr auto data() const { return key.data; }
 
-    constexpr bool is_valid() const
-    {
-      return (key[0] > 0) && (key[1] > 0) && (key[2] > 0) && (key[3] > 0);
-    }
+    constexpr bool is_valid() const { return (key[0] > 0) && (key[1] > 0) && (key[2] > 0) && (key[3] > 0); }
 
     bool operator==(const CommKey &other) const
     {

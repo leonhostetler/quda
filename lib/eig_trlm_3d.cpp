@@ -128,10 +128,10 @@ namespace quda
       getProfile().TPSTART(QUDA_PROFILE_COMPUTE);
 
       // mat_norm is updated and used for LR
-      for (int t = 0; t < ortho_dim_size; t++) 
-	for (int i = num_locked_3D[t]; i < n_kr; i++)
-	  if (fabs(alpha_3D[t][i]) > mat_norm_3D[t]) mat_norm_3D[t] = fabs(alpha_3D[t][i]);
-      
+      for (int t = 0; t < ortho_dim_size; t++)
+        for (int i = num_locked_3D[t]; i < n_kr; i++)
+          if (fabs(alpha_3D[t][i]) > mat_norm_3D[t]) mat_norm_3D[t] = fabs(alpha_3D[t][i]);
+
       // Lambda that returns mat_norm for LR and returns the relevant alpha
       // (the corresponding Ritz value) for SR
       auto check_norm = [&](double sr_norm, int t) -> double {
@@ -140,24 +140,24 @@ namespace quda
         else
           return sr_norm;
       };
-      
+
       // Locking check
       for (int t = 0; t < ortho_dim_size; t++) {
         if (!converged_3D[t]) {
           iter_locked_3D[t] = 0;
           for (int i = 0; i < (n_kr - num_locked_3D[t]); i++) {
             if (residua_3D[t][i + num_locked_3D[t]] < epsilon * check_norm(alpha_3D[t][i + num_locked_3D[t]], t)) {
-	      logQuda(QUDA_DEBUG_VERBOSE, "**** Locking %d %d resid=%+.6e condition=%.6e ****\n", t, i,
-		      residua_3D[t][i + num_locked_3D[t]], epsilon * check_norm(alpha_3D[t][i + num_locked_3D[t]], t));
-	      iter_locked_3D[t] = i+1;
-	    } else {
-	      // Unlikely to find new locked pairs
-	      break;
-	    }
-	  }
-	}
+              logQuda(QUDA_DEBUG_VERBOSE, "**** Locking %d %d resid=%+.6e condition=%.6e ****\n", t, i,
+                      residua_3D[t][i + num_locked_3D[t]], epsilon * check_norm(alpha_3D[t][i + num_locked_3D[t]], t));
+              iter_locked_3D[t] = i + 1;
+            } else {
+              // Unlikely to find new locked pairs
+              break;
+            }
+          }
+        }
       }
-      
+
       // Convergence check
       for (int t = 0; t < ortho_dim_size; t++) {
         if (!converged_3D[t]) {
@@ -166,7 +166,7 @@ namespace quda
             if (residua_3D[t][i + num_locked_3D[t]] < tol * check_norm(alpha_3D[t][i + num_locked_3D[t]], t)) {
               logQuda(QUDA_DEBUG_VERBOSE, "**** Converged %d %d resid=%+.6e condition=%.6e ****\n", t, i,
                       residua_3D[t][i + num_locked_3D[t]], tol * check_norm(alpha_3D[t][i + num_locked_3D[t]], t));
-              iter_converged_3D[t] = i+1;
+              iter_converged_3D[t] = i + 1;
             } else {
               // Unlikely to find new converged pairs
               break;
@@ -174,7 +174,7 @@ namespace quda
           }
         }
       }
-      
+
       for (int t = 0; t < ortho_dim_size; t++) {
         if (!converged_3D[t])
           iter_keep_3D[t]
@@ -185,9 +185,9 @@ namespace quda
       computeKeptRitz3D(kSpace);
       getProfile().TPSTART(QUDA_PROFILE_COMPUTE);
 
-      int min_nconv = n_kr+1;
-      int min_nlock = n_kr+1;
-      int min_nkeep = n_kr+1;
+      int min_nconv = n_kr + 1;
+      int min_nlock = n_kr + 1;
+      int min_nkeep = n_kr + 1;
 
       for (int t = 0; t < ortho_dim_size; t++) {
         if (!converged_3D[t]) {
@@ -195,11 +195,11 @@ namespace quda
           num_keep_3D[t] = num_locked_3D[t] + iter_keep_3D[t];
           num_locked_3D[t] += iter_locked_3D[t];
 
-          if (num_converged_3D[t]<min_nconv) min_nconv=num_converged_3D[t];
-          if (num_locked_3D[t]<min_nlock) min_nlock=num_locked_3D[t];
-          if (num_keep_3D[t]<min_nkeep) min_nkeep=num_keep_3D[t];
+          if (num_converged_3D[t] < min_nconv) min_nconv = num_converged_3D[t];
+          if (num_locked_3D[t] < min_nlock) min_nlock = num_locked_3D[t];
+          if (num_keep_3D[t] < min_nkeep) min_nkeep = num_keep_3D[t];
 
-	  // Use printf to get data from t dim only
+          // Use printf to get data from t dim only
           if (getVerbosity() >= QUDA_DEBUG_VERBOSE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
             printf("%04d converged eigenvalues for timeslice %d at restart iter %04d\n", num_converged_3D[t],
                    t_offset + t, restart_iter + 1);
@@ -210,8 +210,7 @@ namespace quda
             printf("num_keep[%d] = %d\n", t_offset + t, num_keep_3D[t]);
             printf("num_locked[%d] = %d\n", t_offset + t, num_locked_3D[t]);
             for (int i = 0; i < n_kr; i++) {
-              printf("Ritz[%d][%d] = %.16e residual[%d] = %.16e\n", t_offset + t, i, alpha_3D[t][i], i,
-                     residua_3D[t][i]);
+              printf("Ritz[%d][%d] = %.16e residual[%d] = %.16e\n", t_offset + t, i, alpha_3D[t][i], i, residua_3D[t][i]);
             }
           }
         }
@@ -221,7 +220,7 @@ namespace quda
       bool all_converged = true;
       for (int t = 0; t < ortho_dim_size; t++) {
         if (num_converged_3D[t] >= n_conv) {
-          converged_3D[t] = true; 
+          converged_3D[t] = true;
         } else {
           all_converged = false;
         }
@@ -362,7 +361,7 @@ namespace quda
     }
 
     // Orthogonalise r against the Krylov space
-    for (int k = 0; k < 1; k++) blockOrthogonalize3D(v, r, j + 1);    //  future work: up to 4 times???
+    for (int k = 0; k < 1; k++) blockOrthogonalize3D(v, r, j + 1); //  future work: up to 4 times???
 
     // b_j[t] = ||r[t]||
     blas3d::reDotProduct(beta_j, r[0], r[0]);
@@ -410,73 +409,73 @@ namespace quda
     }
   }
 
-
   void TRLM3D::eigensolveFromArrowMat3D()
   {
     getProfile().TPSTART(QUDA_PROFILE_EIGEN);
 
     // Loop over the 3D problems
 #pragma omp parallel for
-    for (int t = 0; t < ortho_dim_size; t++){
-      if (!converged_3D[t]){
+    for (int t = 0; t < ortho_dim_size; t++) {
+      if (!converged_3D[t]) {
 
-      int dim = n_kr - num_locked_3D[t];
-      int arrow_pos = num_keep_3D[t] - num_locked_3D[t];
+        int dim = n_kr - num_locked_3D[t];
+        int arrow_pos = num_keep_3D[t] - num_locked_3D[t];
 
-      // Eigen objects
-      MatrixXd A = MatrixXd::Zero(dim, dim);
-      ritz_mat_3D[t].resize(dim * dim);
-      for (int i = 0; i < dim * dim; i++) ritz_mat_3D[t][i] = 0.0;
+        // Eigen objects
+        MatrixXd A = MatrixXd::Zero(dim, dim);
+        ritz_mat_3D[t].resize(dim * dim);
+        for (int i = 0; i < dim * dim; i++) ritz_mat_3D[t][i] = 0.0;
 
-      // Invert the spectrum due to chebyshev
-      if (reverse) {
-        for (int i = num_locked_3D[t]; i < n_kr - 1; i++) {
-          alpha_3D[t][i] *= -1.0;
-          beta_3D[t][i] *= -1.0;
+        // Invert the spectrum due to chebyshev
+        if (reverse) {
+          for (int i = num_locked_3D[t]; i < n_kr - 1; i++) {
+            alpha_3D[t][i] *= -1.0;
+            beta_3D[t][i] *= -1.0;
+          }
+          alpha_3D[t][n_kr - 1] *= -1.0;
         }
-        alpha_3D[t][n_kr - 1] *= -1.0;
+
+        // Construct arrow mat A_{dim,dim}
+        for (int i = 0; i < dim; i++) {
+
+          // alpha_3D populates the diagonal
+          A(i, i) = alpha_3D[t][i + num_locked_3D[t]];
+        }
+
+        for (int i = 0; i < arrow_pos; i++) {
+
+          // beta_3D populates the arrow
+          A(i, arrow_pos) = beta_3D[t][i + num_locked_3D[t]];
+          A(arrow_pos, i) = beta_3D[t][i + num_locked_3D[t]];
+        }
+
+        for (int i = arrow_pos; i < dim - 1; i++) {
+
+          // beta_3D populates the sub-diagonal
+          A(i, i + 1) = beta_3D[t][i + num_locked_3D[t]];
+          A(i + 1, i) = beta_3D[t][i + num_locked_3D[t]];
+        }
+
+        // Eigensolve the arrow matrix
+        SelfAdjointEigenSolver<MatrixXd> eigensolver;
+        eigensolver.compute(A);
+
+        // repopulate ritz matrix
+        for (int i = 0; i < dim; i++)
+          for (int j = 0; j < dim; j++) ritz_mat_3D[t][dim * i + j] = eigensolver.eigenvectors().col(i)[j];
+
+        for (int i = 0; i < dim; i++) {
+          residua_3D[t][i + num_locked_3D[t]] = fabs(beta_3D[t][n_kr - 1] * eigensolver.eigenvectors().col(i)[dim - 1]);
+          // Update the alpha_3D array
+          alpha_3D[t][i + num_locked_3D[t]] = eigensolver.eigenvalues()[i];
+        }
+
+        // Put spectrum back in order
+        if (reverse) {
+          for (int i = num_locked_3D[t]; i < n_kr; i++) { alpha_3D[t][i] *= -1.0; }
+        }
       }
-
-      // Construct arrow mat A_{dim,dim}
-      for (int i = 0; i < dim; i++) {
-
-        // alpha_3D populates the diagonal
-        A(i, i) = alpha_3D[t][i + num_locked_3D[t]];
-      }
-
-      for (int i = 0; i < arrow_pos; i++) {
-
-        // beta_3D populates the arrow
-        A(i, arrow_pos) = beta_3D[t][i + num_locked_3D[t]];
-        A(arrow_pos, i) = beta_3D[t][i + num_locked_3D[t]];
-      }
-
-      for (int i = arrow_pos; i < dim - 1; i++) {
-
-        // beta_3D populates the sub-diagonal
-        A(i, i + 1) = beta_3D[t][i + num_locked_3D[t]];
-        A(i + 1, i) = beta_3D[t][i + num_locked_3D[t]];
-      }
-
-      // Eigensolve the arrow matrix
-      SelfAdjointEigenSolver<MatrixXd> eigensolver;
-      eigensolver.compute(A);
-
-      // repopulate ritz matrix
-      for (int i = 0; i < dim; i++)
-        for (int j = 0; j < dim; j++) ritz_mat_3D[t][dim * i + j] = eigensolver.eigenvectors().col(i)[j];
-
-      for (int i = 0; i < dim; i++) {
-        residua_3D[t][i + num_locked_3D[t]] = fabs(beta_3D[t][n_kr - 1] * eigensolver.eigenvectors().col(i)[dim - 1]);
-        // Update the alpha_3D array
-        alpha_3D[t][i + num_locked_3D[t]] = eigensolver.eigenvalues()[i];
-      }
-
-      // Put spectrum back in order
-      if (reverse) {
-        for (int i = num_locked_3D[t]; i < n_kr; i++) { alpha_3D[t][i] *= -1.0; }
-      }
-    }}
+    }
 
     getProfile().TPSTOP(QUDA_PROFILE_EIGEN);
   }
@@ -505,7 +504,8 @@ namespace quda
         }
 
         // Alias the vectors we wish to keep.
-        vector_ref<ColorSpinorField> vecs_locked(kSpace.begin() + num_locked_3D[t], kSpace.begin() + num_locked_3D[t] + dim);
+        vector_ref<ColorSpinorField> vecs_locked(kSpace.begin() + num_locked_3D[t],
+                                                 kSpace.begin() + num_locked_3D[t] + dim);
 
         // multiBLAS axpy. Create 3D vectors so that we may perform all t independent
         // vector rotations.
@@ -516,7 +516,7 @@ namespace quda
         for (int i = vecs_t.size(); i < dim; i++) vecs_t.push_back(csParamClone);
         for (int i = kSpace_t.size(); i < keep; i++) kSpace_t.push_back(csParamClone);
 
-	blas::zero(kSpace_t);
+        blas::zero(kSpace_t);
 
         // Copy to data to 3D array, zero out workspace, make pointers
         for (int i = 0; i < dim; i++) blas3d::copy(t, blas3d::COPY_TO_3D, vecs_t[i], vecs_locked[i]);
@@ -545,7 +545,6 @@ namespace quda
     getProfile().TPSTOP(QUDA_PROFILE_COMPUTE);
   }
 
-
   // Orthogonalise r[t][0:] against V_[t][0:j]
   void TRLM3D::blockOrthogonalize3D(std::vector<ColorSpinorField> &vecs, std::vector<ColorSpinorField> &rvecs, int j)
   {
@@ -555,9 +554,7 @@ namespace quda
 
       // Block dot products stored in s_t.
       blas3d::cDotProduct(s_t, vecs[i], rvecs[0]);
-      for (int t = 0; t < ortho_dim_size; t++) {
-        s_t[t] *= active_3D[t] ? -1.0 : 0.0;
-      }
+      for (int t = 0; t < ortho_dim_size; t++) { s_t[t] *= active_3D[t] ? -1.0 : 0.0; }
 
       // Block orthogonalise
       blas3d::caxpby(s_t, vecs[i], unit_new, rvecs[0]);
@@ -599,12 +596,12 @@ namespace quda
 
     // Compute spectral radius estimate
     std::vector<double> inner_products(ortho_dim_size, 0.0);
-    blas3d::reDotProduct(inner_products, out, in);    
+    blas3d::reDotProduct(inner_products, out, in);
 
     auto result = *std::max_element(inner_products.begin(), inner_products.end());
     comm_allreduce_max(result);
     logQuda(QUDA_VERBOSE, "Chebyshev max %e\n", result);
-    
+
     // Increase final result by 10% for safety
     return result * 1.10;
   }
@@ -652,8 +649,8 @@ namespace quda
 
             // Use printf to get data from t dim only
             if (getVerbosity() >= QUDA_VERBOSE) {
-              printf("Eval[%02d][%04d] = (%+.16e,%+.16e) residual = %+.16e\n",t_offset + t, i,
-                     evals_t[i][t].real(), evals_t[i][t].imag(), residua_3D[t][i]);
+              printf("Eval[%02d][%04d] = (%+.16e,%+.16e) residual = %+.16e\n", t_offset + t, i, evals_t[i][t].real(),
+                     evals_t[i][t].imag(), residua_3D[t][i]);
             }
 
             // Transfer evals to eval array

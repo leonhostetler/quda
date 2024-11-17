@@ -81,7 +81,8 @@ namespace quda {
 
   GaugeLaplacePC::GaugeLaplacePC(const DiracParam &param) : GaugeLaplace(param)
   {
-    for (auto i = 0; i < 4; i++) if (laplace3D == i) errorQuda("Cannot use 3-d operator with e/o preconditioning");
+    for (auto i = 0; i < 4; i++)
+      if (laplace3D == i) errorQuda("Cannot use 3-d operator with e/o preconditioning");
   }
 
   GaugeLaplacePC::GaugeLaplacePC(const GaugeLaplacePC &dirac) : GaugeLaplace(dirac) { }

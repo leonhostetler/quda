@@ -251,7 +251,8 @@ std::array<double, 2> verifyStaggeredInversion(quda::ColorSpinorField &in,
  * @return The residual norm
  */
 double verifyStaggeredTypeEigenvector(quda::ColorSpinorField &spinor, const std::vector<double _Complex> &lambda, int i,
-                                      QudaEigParam &eig_param, quda::GaugeField &fat_link, quda::GaugeField &long_link, int laplace3D);
+                                      QudaEigParam &eig_param, quda::GaugeField &fat_link, quda::GaugeField &long_link,
+                                      int laplace3D);
 
 /**
  * @brief Verify a staggered-type singular vector

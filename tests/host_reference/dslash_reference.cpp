@@ -845,7 +845,8 @@ std::array<double, 2> verifyStaggeredInversion(quda::ColorSpinorField &in,
 }
 
 double verifyStaggeredTypeEigenvector(quda::ColorSpinorField &spinor, const std::vector<double _Complex> &lambda, int i,
-                                      QudaEigParam &eig_param, quda::GaugeField &fat_link, quda::GaugeField &long_link, int laplace3D)
+                                      QudaEigParam &eig_param, quda::GaugeField &fat_link, quda::GaugeField &long_link,
+                                      int laplace3D)
 {
   QudaInvertParam &inv_param = *(eig_param.invert_param);
   int dagger = inv_param.dagger == QUDA_DAG_YES ? 1 : 0;
@@ -891,23 +892,23 @@ double verifyStaggeredTypeEigenvector(quda::ColorSpinorField &spinor, const std:
     std::vector<double> src2(spinor.X()[3], 0.0);
     // Compute M * x - \lambda * x on each slice
     for (auto t = 0; t < spinor.X()[3]; t++) {
-      auto t_global = t_offset + t ;
+      auto t_global = t_offset + t;
       auto batch_size = (spinor.VolumeCB() / spinor.X()[3]) * stag_spinor_site_size;
       auto offset = t * batch_size * inv_param.cpu_prec;
 
       for (int parity = 0; parity < spinor.SiteSubset(); parity++) {
-        caxpy(-lambda[t_global], static_cast<char*>(spinor.data()) + offset,
-              static_cast<char*>(ref.data()) + offset, batch_size, inv_param.cpu_prec);
+        caxpy(-lambda[t_global], static_cast<char *>(spinor.data()) + offset, static_cast<char *>(ref.data()) + offset,
+              batch_size, inv_param.cpu_prec);
 
-        nrm2[t] += norm_2(static_cast<char*>(ref.data()) + offset, batch_size, inv_param.cpu_prec, false);
-        src2[t] += norm_2(static_cast<char*>(spinor.data()) + offset, batch_size, inv_param.cpu_prec, false);
+        nrm2[t] += norm_2(static_cast<char *>(ref.data()) + offset, batch_size, inv_param.cpu_prec, false);
+        src2[t] += norm_2(static_cast<char *>(spinor.data()) + offset, batch_size, inv_param.cpu_prec, false);
 
         offset += spinor.VolumeCB() * stag_spinor_site_size * inv_param.cpu_prec;
       }
 
-      auto l = ((double*)&(lambda[t_global]))[0];
-      printfQuda("Eigenvector %4d, t = %d lambda = %15.14e: tol %.2e, host residual = %.15e\n",
-                 i, t_global, l, eig_param.tol, sqrt(nrm2[t] / src2[t]));
+      auto l = ((double *)&(lambda[t_global]))[0];
+      printfQuda("Eigenvector %4d, t = %d lambda = %15.14e: tol %.2e, host residual = %.15e\n", i, t_global, l,
+                 eig_param.tol, sqrt(nrm2[t] / src2[t]));
     }
     return sqrt(nrm2[0] / src2[0]);
   } else {

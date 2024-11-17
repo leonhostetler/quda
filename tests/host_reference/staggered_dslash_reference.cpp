@@ -36,8 +36,8 @@ template <typename real_t>
 void staggeredDslashReference(real_t *res, const real_t *const *fatlink, const real_t *const *longlink,
                               const real_t *const *ghostFatlink, const real_t *const *ghostLonglink,
                               const real_t *spinorField, const real_t *const *fwd_nbr_spinor,
-                              const real_t *const *back_nbr_spinor, int oddBit, int daggerBit, QudaDslashType dslash_type,
-                              int laplace3D)
+                              const real_t *const *back_nbr_spinor, int oddBit, int daggerBit,
+                              QudaDslashType dslash_type, int laplace3D)
 {
   if (laplace3D < 4 && dslash_type != QUDA_LAPLACE_DSLASH)
     errorQuda("laplace3D = %d only supported for Laplace dslash (%d requested)", laplace3D, dslash_type);
@@ -115,8 +115,7 @@ void staggeredDslashReference(real_t *res, const real_t *const *fatlink, const r
 }
 
 void stag_dslash(ColorSpinorField &out, const GaugeField &fat_link, const GaugeField &long_link,
-                 const ColorSpinorField &in, int oddBit, int daggerBit, QudaDslashType dslash_type,
-                 int laplace3D)
+                 const ColorSpinorField &in, int oddBit, int daggerBit, QudaDslashType dslash_type, int laplace3D)
 {
   // assert sPrecision and gPrecision must be the same
   if (in.Precision() != fat_link.Precision()) {
@@ -151,13 +150,15 @@ void stag_dslash(ColorSpinorField &out, const GaugeField &fat_link, const GaugeF
                              reinterpret_cast<double **>(qdp_longlink), reinterpret_cast<double **>(ghost_fatlink),
                              reinterpret_cast<double **>(ghost_longlink), static_cast<double *>(in.data()),
                              reinterpret_cast<double **>(in.fwdGhostFaceBuffer),
-                             reinterpret_cast<double **>(in.backGhostFaceBuffer), oddBit, daggerBit, dslash_type, laplace3D);
+                             reinterpret_cast<double **>(in.backGhostFaceBuffer), oddBit, daggerBit, dslash_type,
+                             laplace3D);
   } else if (in.Precision() == QUDA_SINGLE_PRECISION) {
     staggeredDslashReference(static_cast<float *>(out.data()), reinterpret_cast<float **>(qdp_fatlink),
                              reinterpret_cast<float **>(qdp_longlink), reinterpret_cast<float **>(ghost_fatlink),
                              reinterpret_cast<float **>(ghost_longlink), static_cast<float *>(in.data()),
                              reinterpret_cast<float **>(in.fwdGhostFaceBuffer),
-                             reinterpret_cast<float **>(in.backGhostFaceBuffer), oddBit, daggerBit, dslash_type, laplace3D);
+                             reinterpret_cast<float **>(in.backGhostFaceBuffer), oddBit, daggerBit, dslash_type,
+                             laplace3D);
   }
 }
 

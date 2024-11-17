@@ -44,8 +44,16 @@ namespace quda
         }
       }
 
-      void preTune() { x.backup(); y.backup(); }
-      void postTune() { x.restore(); y.restore(); }
+      void preTune()
+      {
+        x.backup();
+        y.backup();
+      }
+      void postTune()
+      {
+        x.restore();
+        y.restore();
+      }
       long long bytes() const { return (type == SWAP_3D ? 2 : 1) * (x.Bytes() / x.X(3) + y.Bytes() / y.X(3)); }
     };
 
@@ -124,7 +132,8 @@ namespace quda
       unsigned int minThreads() const override { return x.VolumeCB(); }
 
     public:
-      caxpby3D(const ColorSpinorField &x, ColorSpinorField &y, const std::vector<Complex> &a, const std::vector<Complex> &b) :
+      caxpby3D(const ColorSpinorField &x, ColorSpinorField &y, const std::vector<Complex> &a,
+               const std::vector<Complex> &b) :
         TunableKernel2D(x, x.SiteSubset()), x(x), y(y), a(a), b(b)
       {
         apply(device::get_default_stream());
@@ -142,7 +151,8 @@ namespace quda
       long long bytes() const override { return x.Bytes() + 2 * y.Bytes(); }
     };
 
-    void caxpby(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y)
+    void caxpby(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b,
+                ColorSpinorField &y)
     {
       checkPrecision(x, y);
       checkSpin(x, y);
@@ -191,7 +201,7 @@ namespace quda
 
       // We must give a Lattice field as the first argument
       instantiate<reDotProduct3D>(x, y, result);
-   }
+    }
 
     template <typename Float, int nColor> class cDotProduct3D : TunableMultiReduction
     {

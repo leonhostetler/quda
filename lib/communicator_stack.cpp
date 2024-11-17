@@ -81,9 +81,9 @@ namespace quda
       if (tune_cache_update) {
         auto num_sub_partition = split_key_old.product(); // the number of caches we need to merge
         int sub_partition_dims[] = {comm_dim(0) / split_key_old[0], comm_dim(1) / split_key_old[1],
-          comm_dim(2) / split_key_old[2], comm_dim(3) / split_key_old[3]};
+                                    comm_dim(2) / split_key_old[2], comm_dim(3) / split_key_old[3]};
         int sub_partition_coords[] = {comm_coord(0) / sub_partition_dims[0], comm_coord(1) / sub_partition_dims[1],
-          comm_coord(2) / sub_partition_dims[2], comm_coord(3) / sub_partition_dims[3]};
+                                      comm_coord(2) / sub_partition_dims[2], comm_coord(3) / sub_partition_dims[3]};
         auto sub_partition_idx = sub_partition_coords[split_key_old.n_dim - 1];
         for (auto d = split_key_old.n_dim - 2; d >= 0; d--)
           sub_partition_idx = sub_partition_idx * split_key_old[d] + sub_partition_coords[d];

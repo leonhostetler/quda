@@ -317,8 +317,8 @@ namespace quda
     getProfile().TPSTOP(QUDA_PROFILE_EPILOGUE);
   }
 
-  void createDiracWithEig(Dirac *&d, Dirac *&dSloppy, Dirac *&dPre, Dirac *&dEig, QudaInvertParam &param,
-                          bool pc_solve, bool use_smeared_gauge);
+  void createDiracWithEig(Dirac *&d, Dirac *&dSloppy, Dirac *&dPre, Dirac *&dEig, QudaInvertParam &param, bool pc_solve,
+                          bool use_smeared_gauge);
 
   extern std::vector<ColorSpinorField> solutionResident;
 

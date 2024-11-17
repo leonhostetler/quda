@@ -121,7 +121,7 @@ namespace quda
                 grid_size, size);
     }
 
-  // defer handling MPI errors to QUDA
+    // defer handling MPI errors to QUDA
     MPI_Comm_set_errhandler(MPI_COMM_HANDLE, MPI_ERRORS_RETURN);
 
     comm_init_common(ndim, dims, rank_from_coords, map_data);

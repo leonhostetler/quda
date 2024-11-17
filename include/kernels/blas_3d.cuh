@@ -124,7 +124,8 @@ namespace quda
     real b[MAX_ORTHO_DIM];
     F y;
 
-    axpby3dArg(const std::vector<double> &a, const ColorSpinorField &x, const std::vector<double> &b, ColorSpinorField &y) :
+    axpby3dArg(const std::vector<double> &a, const ColorSpinorField &x, const std::vector<double> &b,
+               ColorSpinorField &y) :
       baseArg(dim3(x.VolumeCB(), x.SiteSubset(), 1), x), x(x), y(y)
     {
       if (x.X(3) > MAX_ORTHO_DIM) errorQuda("Orthogonal dimension %d exceeds maximum %d", x.X(3), MAX_ORTHO_DIM);
@@ -178,7 +179,8 @@ namespace quda
     complex<real> b[MAX_ORTHO_DIM];
     F y;
 
-    caxpby3dArg(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b, ColorSpinorField &y) :
+    caxpby3dArg(const std::vector<Complex> &a, const ColorSpinorField &x, const std::vector<Complex> &b,
+                ColorSpinorField &y) :
       baseArg(dim3(x.VolumeCB(), x.SiteSubset(), 1), x), x(x), y(y)
     {
       if (x.X(3) > MAX_ORTHO_DIM) errorQuda("Orthogonal dimension %d exceeds maximum %d", x.X(3), MAX_ORTHO_DIM);
@@ -282,11 +284,12 @@ namespace quda
 
     F x;
     F y;
-    int_fastdiv X[4]; // grid dimensions
+    int_fastdiv X[4];  // grid dimensions
     int_fastdiv Xh[4]; // checkerboard grid dimensions
 
     cDotProduct3dArg(const ColorSpinorField &x, const ColorSpinorField &y) :
-      ReduceArg<array<double, 2>>(dim3(x.VolumeCB() / x.X()[reduction_dim], x.SiteSubset(), x.X()[reduction_dim]), x.X()[reduction_dim]),
+      ReduceArg<array<double, 2>>(dim3(x.VolumeCB() / x.X()[reduction_dim], x.SiteSubset(), x.X()[reduction_dim]),
+                                  x.X()[reduction_dim]),
       x(x),
       y(y)
     {

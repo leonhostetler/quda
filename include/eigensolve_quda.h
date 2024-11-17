@@ -555,7 +555,6 @@ namespace quda
        @param[in] size The number of eigenvalues to compute
     */
     void computeEvals(std::vector<ColorSpinorField> &evecs, std::vector<Complex> &evals, int size = 0) override;
-
   };
 
   /**

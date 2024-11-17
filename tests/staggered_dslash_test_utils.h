@@ -90,7 +90,9 @@ struct StaggeredDslashTestWrapper {
       case dslash_test_type::MatPC:
         stag_matpc(spinorRef[i], cpuFat, cpuLong, spinor[i], mass, 0, parity, dslash_type, laplace3D);
         break;
-      case dslash_test_type::Mat: stag_mat(spinorRef[i], cpuFat, cpuLong, spinor[i], mass, dagger, dslash_type, laplace3D); break;
+      case dslash_test_type::Mat:
+        stag_mat(spinorRef[i], cpuFat, cpuLong, spinor[i], mass, dagger, dslash_type, laplace3D);
+        break;
       case dslash_test_type::MatDagMat:
         stag_matdag_mat(spinorRef[i], cpuFat, cpuLong, spinor[i], mass, dagger, dslash_type, laplace3D);
         break;
