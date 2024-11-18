@@ -408,12 +408,12 @@ struct StaggeredDslashTestWrapper {
 
       size_t ghost_bytes = cudaSpinor[0].GhostBytes();
 
-      ::testing::Test::RecordProperty("Halo_bidirectitonal_BW_GPU",
+      ::testing::Test::RecordProperty("Halo_bidirectional_BW_GPU",
                                       1.0e-9 * 2 * ghost_bytes * niter / dslash_time.event_time);
-      ::testing::Test::RecordProperty("Halo_bidirectitonal_BW_CPU",
+      ::testing::Test::RecordProperty("Halo_bidirectional_BW_CPU",
                                       1.0e-9 * 2 * ghost_bytes * niter / dslash_time.cpu_time);
-      ::testing::Test::RecordProperty("Halo_bidirectitonal_BW_CPU_min", 1.0e-9 * 2 * ghost_bytes / dslash_time.cpu_max);
-      ::testing::Test::RecordProperty("Halo_bidirectitonal_BW_CPU_max", 1.0e-9 * 2 * ghost_bytes / dslash_time.cpu_min);
+      ::testing::Test::RecordProperty("Halo_bidirectional_BW_CPU_min", 1.0e-9 * 2 * ghost_bytes / dslash_time.cpu_max);
+      ::testing::Test::RecordProperty("Halo_bidirectional_BW_CPU_max", 1.0e-9 * 2 * ghost_bytes / dslash_time.cpu_min);
       ::testing::Test::RecordProperty("Halo_message_size_bytes", 2 * ghost_bytes);
 
       printfQuda(
