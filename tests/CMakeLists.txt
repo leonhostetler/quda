@@ -963,7 +963,7 @@ endif()
       set_tests_properties(dslash_${DIRAC_NAME}_build_policy${pol2} PROPERTIES ENVIRONMENT QUDA_ENABLE_DSLASH_POLICY=${pol2})
     endif()
 
-    if(QUDA_LAPLACE)
+    if(QUDA_DIRAC_LAPLACE)
       set(DIRAC_NAME laplace)
       add_test(NAME dslash_${DIRAC_NAME}_mat_policy${pol2}
                COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:staggered_dslash_ctest> ${MPIEXEC_POSTFLAGS}
@@ -1207,7 +1207,7 @@ foreach(prec IN LISTS TEST_PRECS)
       --enable-testing true
       --gtest_output=xml:invert_test_splitgrid_asqtad_${prec}.xml)
 
-    if (QUDA_LAPLACE)
+    if (QUDA_DIRAC_LAPLACE)
       add_test(NAME invert_test_laplace_${prec}
         COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:staggered_invert_test> ${MPIEXEC_POSTFLAGS}
         --dslash-type laplace --ngcrkrylov 8 --compute-fat-long true
@@ -1440,7 +1440,7 @@ foreach(prec IN LISTS TEST_PRECS)
         --gtest_output=xml:staggered_eigensolve_test_staggered_${prec}.xml)
     endif()
 
-    if (QUDA_LAPLACE)
+    if (QUDA_DIRAC_LAPLACE)
       add_test(NAME eigensolve_test_laplace_${prec}
         COMMAND ${QUDA_CTEST_LAUNCH} $<TARGET_FILE:staggered_eigensolve_test> ${MPIEXEC_POSTFLAGS}
         --dslash-type laplace --compute-fat-long true
