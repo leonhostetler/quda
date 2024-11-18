@@ -4982,7 +4982,7 @@ void performWuppertalnStep(void *h_out, void *h_in, QudaInvertParam *inv_param, 
 
   for (unsigned int i = 0; i < n_steps; i++) {
     if (i) in = out;
-    ApplyLaplace(out, in, *precise, 3, a, b, in, parity, false, comm_dim, profileWuppertal);
+    ApplyLaplace(out, in, *precise, 3, a, b, in, parity, comm_dim, profileWuppertal);
     logQuda(QUDA_DEBUG_VERBOSE, "Step %d, vector norm %e\n", i, blas::norm2(out));
   }
 
@@ -5306,7 +5306,7 @@ void performGFlowQuda(void *h_out, void *h_in, QudaInvertParam *inv_param, QudaG
     // [4] = Laplace [0]
     copyExtendedGauge(precise, gin, QUDA_CUDA_FIELD_LOCATION);
     precise.exchangeGhost();
-    ApplyLaplace(f_temp4, f_temp0, precise, 4, a, b, f_temp0, parity, false, comm_dim, profileGFlow);
+    ApplyLaplace(f_temp4, f_temp0, precise, 4, a, b, f_temp0, parity, comm_dim, profileGFlow);
 
     // [0] = [4] = Laplace [0] = Laplace [3]
     f_temp0 = f_temp4;
@@ -5324,7 +5324,7 @@ void performGFlowQuda(void *h_out, void *h_in, QudaInvertParam *inv_param, QudaG
     // [4] <- Laplace [1]
     copyExtendedGauge(precise, gout, QUDA_CUDA_FIELD_LOCATION);
     precise.exchangeGhost();
-    ApplyLaplace(f_temp4, f_temp1, precise, 4, a, b, f_temp1, parity, false, comm_dim, profileGFlow);
+    ApplyLaplace(f_temp4, f_temp1, precise, 4, a, b, f_temp1, parity, comm_dim, profileGFlow);
 
     // [1] <- [4]
     f_temp1 = f_temp4;
@@ -5342,7 +5342,7 @@ void performGFlowQuda(void *h_out, void *h_in, QudaInvertParam *inv_param, QudaG
     // [4] <- Laplace [2]
     copyExtendedGauge(precise, gin, QUDA_CUDA_FIELD_LOCATION);
     precise.exchangeGhost();
-    ApplyLaplace(f_temp4, f_temp2, precise, 4, a, b, f_temp2, parity, false, comm_dim, profileGFlow);
+    ApplyLaplace(f_temp4, f_temp2, precise, 4, a, b, f_temp2, parity, comm_dim, profileGFlow);
 
     // [2] <- [4] = Laplace [2]
     f_temp2 = f_temp4;
