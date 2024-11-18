@@ -344,10 +344,10 @@ namespace quda
           std::vector<double> beta_t;
           beta_t.reserve(j - start);
           // Copy residual
-          blas3d::copy(t, blas3d::COPY_TO_3D, r_t, r[0]);
+          blas3d::copy(t, blas3d::copyType::COPY_TO_3D, r_t, r[0]);
           // Copy vectors
           for (int i = start; i < j; i++) {
-            blas3d::copy(t, blas3d::COPY_TO_3D, vecs_t[i - start], v[i]);
+            blas3d::copy(t, blas3d::copyType::COPY_TO_3D, vecs_t[i - start], v[i]);
             beta_t.push_back(-beta_3D[t][i]);
           }
 
@@ -355,7 +355,7 @@ namespace quda
           blas::block::axpy(beta_t, {vecs_t.begin(), vecs_t.begin() + j - start}, r_t);
 
           // Copy residual back to 4D vector
-          blas3d::copy(t, blas3d::COPY_FROM_3D, r_t, r[0]);
+          blas3d::copy(t, blas3d::copyType::COPY_FROM_3D, r_t, r[0]);
         }
       }
     }
@@ -519,7 +519,7 @@ namespace quda
         blas::zero(kSpace_t);
 
         // Copy to data to 3D array, zero out workspace, make pointers
-        for (int i = 0; i < dim; i++) blas3d::copy(t, blas3d::COPY_TO_3D, vecs_t[i], vecs_locked[i]);
+        for (int i = 0; i < dim; i++) blas3d::copy(t, blas3d::copyType::COPY_TO_3D, vecs_t[i], vecs_locked[i]);
 
         // Compute the axpy
         blas::block::axpy(ritz_mat_keep[t], {vecs_t.begin(), vecs_t.begin() + dim},
@@ -529,12 +529,12 @@ namespace quda
 
         // Copy compressed Krylov
         for (int i = 0; i < keep; i++) {
-          blas3d::copy(t, blas3d::COPY_FROM_3D, kSpace_t[i], kSpace[num_locked_3D[t] + i]);
+          blas3d::copy(t, blas3d::copyType::COPY_FROM_3D, kSpace_t[i], kSpace[num_locked_3D[t] + i]);
         }
 
         // Update residual vector
-        blas3d::copy(t, blas3d::COPY_TO_3D, vecs_t[0], kSpace[n_kr]);
-        blas3d::copy(t, blas3d::COPY_FROM_3D, vecs_t[0], kSpace[num_locked_3D[t] + keep]);
+        blas3d::copy(t, blas3d::copyType::COPY_TO_3D, vecs_t[0], kSpace[n_kr]);
+        blas3d::copy(t, blas3d::copyType::COPY_FROM_3D, vecs_t[0], kSpace[num_locked_3D[t] + keep]);
 
         // Update sub arrow matrix
         for (int i = 0; i < keep; i++)

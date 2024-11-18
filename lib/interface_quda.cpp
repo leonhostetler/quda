@@ -2434,7 +2434,7 @@ quda::GaugeField *checkGauge(QudaInvertParam *param, bool use_smeared_gauge = fa
     if (gaugeRefinement == nullptr) errorQuda("Refinement gauge field doesn't exist");
     if (gaugeEigensolver == nullptr) errorQuda("Refinement gauge field doesn't exist");
     if (param->overlap && gaugeExtended == nullptr) errorQuda("Extended gauge field doesn't exist");
-  } else {
+  } else if (!use_smeared_gauge) {
     if (gaugeLongPrecise == nullptr) errorQuda("Precise gauge long field doesn't exist");
 
     if (param->cuda_prec_sloppy != gaugeFatSloppy->Precision()

@@ -18,17 +18,17 @@ namespace quda
       ColorSpinorField &y;
       ColorSpinorField &x;
       const int t_slice;
-      const copy3dType type;
+      const copyType type;
       unsigned int minThreads() const { return y.VolumeCB(); }
 
     public:
-      copy3D(ColorSpinorField &y, ColorSpinorField &x, int t_slice, copy3dType type) :
+      copy3D(ColorSpinorField &y, ColorSpinorField &x, int t_slice, copyType type) :
         TunableKernel2D(y, y.SiteSubset()), y(y), x(x), t_slice(t_slice), type(type)
       {
         // Check slice value
         if (t_slice < 0 || t_slice >= y.X()[3]) errorQuda("Unexpected slice %d", t_slice);
 
-        strcat(aux, type == SWAP_3D ? ",swap_3d" : type == COPY_TO_3D ? ",to_3d" : ",from_3d");
+        strcat(aux, type == copyType::SWAP_3D ? ",swap_3d" : type == copyType::COPY_TO_3D ? ",to_3d" : ",from_3d");
         apply(device::get_default_stream());
       }
 
@@ -37,9 +37,9 @@ namespace quda
         TuneParam tp = tuneLaunch(*this, getTuning(), getVerbosity());
         copy3dArg<Float, nColor> arg(y, x, t_slice);
         switch (type) {
-        case COPY_TO_3D: launch<copyTo3d>(tp, stream, arg); break;
-        case COPY_FROM_3D: launch<copyFrom3d>(tp, stream, arg); break;
-        case SWAP_3D: launch<swap3d>(tp, stream, arg); break;
+        case copyType::COPY_TO_3D: launch<copyTo3d>(tp, stream, arg); break;
+        case copyType::COPY_FROM_3D: launch<copyFrom3d>(tp, stream, arg); break;
+        case copyType::SWAP_3D: launch<swap3d>(tp, stream, arg); break;
         default: errorQuda("Unknown 3D copy type");
         }
       }
@@ -54,10 +54,13 @@ namespace quda
         x.restore();
         y.restore();
       }
-      long long bytes() const { return (type == SWAP_3D ? 2 : 1) * (x.Bytes() / x.X(3) + y.Bytes() / y.X(3)); }
+      long long bytes() const
+      {
+        return (type == copyType::SWAP_3D ? 2 : 1) * (x.Bytes() / x.X(3) + y.Bytes() / y.X(3));
+      }
     };
 
-    void copy(const int slice, const copy3dType type, ColorSpinorField &x, ColorSpinorField &y)
+    void copy(const int slice, const copyType type, ColorSpinorField &x, ColorSpinorField &y)
     {
       checkPrecision(x, y);
       checkSpin(x, y);
@@ -73,7 +76,7 @@ namespace quda
       checkPrecision(x, y);
       checkSpin(x, y);
       checkColor(x, y);
-      instantiate<copy3D>(x, y, slice, SWAP_3D);
+      instantiate<copy3D>(x, y, slice, copyType::SWAP_3D);
     }
 
     template <typename Float, int nColor> class axpby3D : TunableKernel2D

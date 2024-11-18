@@ -10,7 +10,7 @@ namespace quda
   {
 
     // Local enum for the 3D copy type
-    enum copy3dType { COPY_TO_3D, COPY_FROM_3D, SWAP_3D };
+    enum class copyType { COPY_TO_3D, COPY_FROM_3D, SWAP_3D };
 
     /**
        @brief Extract / insert / swap a timeslice between a 4-d field and a 3-d field
@@ -21,7 +21,7 @@ namespace quda
        @param[in,out] x 3-d field
        @param[in,out] y 4-d field
     */
-    void copy(int slice, copy3dType type, ColorSpinorField &x, ColorSpinorField &y);
+    void copy(int slice, copyType type, ColorSpinorField &x, ColorSpinorField &y);
 
     /**
        @brief Swap the slice in two given fields
