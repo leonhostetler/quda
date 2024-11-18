@@ -165,10 +165,13 @@ std::vector<double> eigensolve(test_t test_param)
   // whether we are using the resident smeared gauge or not
   eig_param.use_smeared_gauge = gauge_smear;
 
-  if (laplace3D == 3) {
+  if (dslash_type == QUDA_LAPLACE_DSLASH) {
+    eig_inv_param.kappa = 1.0 / ((laplace3D == 3 ? 6 : 8) + mass);
     eig_inv_param.laplace3D = laplace3D;
-    eig_param.ortho_dim = laplace3D;
-    eig_param.ortho_dim_size_local = tdim;
+    if (laplace3D == 3) {
+      eig_param.ortho_dim = laplace3D;
+      eig_param.ortho_dim_size_local = tdim;
+    }
   }
 
   // For gtest testing, we prohibit the use of polynomial acceleration as
