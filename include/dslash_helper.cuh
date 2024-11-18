@@ -12,12 +12,7 @@
 #include <kernel_helper.h>
 #include <tune_quda.h>
 
-#if defined(_NVHPC_CUDA)
-#include <constant_kernel_arg.h>
-constexpr quda::use_kernel_arg_p use_kernel_arg = quda::use_kernel_arg_p::FALSE;
-#else
 constexpr quda::use_kernel_arg_p use_kernel_arg = quda::use_kernel_arg_p::TRUE;
-#endif
 
 #include <kernel.h>
 
