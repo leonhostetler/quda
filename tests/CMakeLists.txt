@@ -291,6 +291,8 @@ if(QUDA_MPI OR QUDA_QMP)
   message(STATUS "ctest will run on ${QUDA_TEST_NUM_PROCS} processes")
   set(QUDA_CTEST_LAUNCH ${MPIEXEC_EXECUTABLE};${MPIEXEC_NUMPROC_FLAG};${QUDA_TEST_NUM_PROCS};${MPIEXEC_PREFLAGS}
     CACHE STRING "CTest Launcher command for QUDA's tests")
+else()
+  set(QUDA_TEST_NUM_PROCS 1)
 endif()
 
 # BLAS tests

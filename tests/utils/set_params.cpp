@@ -1006,7 +1006,7 @@ void setStaggeredInvertParam(QudaInvertParam &inv_param)
   inv_param.solve_type = solve_type;
   inv_param.matpc_type = matpc_type;
   inv_param.dagger = QUDA_DAG_NO;
-  inv_param.mass_normalization = QUDA_MASS_NORMALIZATION;
+  inv_param.mass_normalization = dslash_type == QUDA_LAPLACE_DSLASH ? QUDA_KAPPA_NORMALIZATION : QUDA_MASS_NORMALIZATION;
 
   inv_param.cpu_prec = cpu_prec;
   inv_param.cuda_prec = prec;

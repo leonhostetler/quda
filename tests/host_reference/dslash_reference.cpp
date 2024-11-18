@@ -746,17 +746,17 @@ double verifyWilsonTypeSingularVector(void *spinor_left, void *spinor_right, dou
 
 std::array<double, 2> verifyStaggeredInversion(quda::ColorSpinorField &in, quda::ColorSpinorField &out,
                                                quda::GaugeField &fat_link, quda::GaugeField &long_link,
-                                               QudaInvertParam &inv_param, int src_idx)
+                                               QudaInvertParam &inv_param, int laplace3D, int src_idx)
 {
   std::vector<quda::ColorSpinorField> out_vector(1);
   out_vector[0] = out;
-  return verifyStaggeredInversion(in, out_vector, fat_link, long_link, inv_param, src_idx);
+  return verifyStaggeredInversion(in, out_vector, fat_link, long_link, inv_param, laplace3D, src_idx);
 }
 
 std::array<double, 2> verifyStaggeredInversion(quda::ColorSpinorField &in,
                                                std::vector<quda::ColorSpinorField> &out_vector,
                                                quda::GaugeField &fat_link, quda::GaugeField &long_link,
-                                               QudaInvertParam &inv_param, int src_idx)
+                                               QudaInvertParam &inv_param, int laplace3D, int src_idx)
 {
   int dagger = inv_param.dagger == QUDA_DAG_YES ? 1 : 0;
   double l2r_max = 0.0;
@@ -810,9 +810,6 @@ std::array<double, 2> verifyStaggeredInversion(quda::ColorSpinorField &in,
     double mass = inv_param.mass;
     if (inv_param.solution_type == QUDA_MAT_SOLUTION) {
       stag_mat(ref, fat_link, long_link, out, mass, dagger, dslash_type, laplace3D);
-
-      // correct for the massRescale function inside invertQuda
-      if (is_laplace(dslash_type)) ax(0.5 / kappa, ref.data(), ref.Length(), ref.Precision());
     } else if (inv_param.solution_type == QUDA_MATPC_SOLUTION) {
       QudaParity parity = QUDA_INVALID_PARITY;
       switch (inv_param.matpc_type) {
