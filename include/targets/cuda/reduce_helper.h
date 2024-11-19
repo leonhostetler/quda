@@ -169,11 +169,7 @@ namespace quda
     auto tid = target::thread_idx_linear<2>();
 
     if (arg.result_d) { // write to host mapped memory
-#ifdef _NVHPC_CUDA      // WAR for nvc++
-      constexpr bool coalesced_write = false;
-#else
       constexpr bool coalesced_write = true;
-#endif
       if constexpr (coalesced_write) {
         static_assert(n <= device::warp_size(), "reduction array is greater than warp size");
         auto mask = __ballot_sync(0xffffffff, tid < n);
