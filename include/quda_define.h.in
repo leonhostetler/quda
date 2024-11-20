@@ -42,6 +42,16 @@
 #undef QUDA_HETEROGENEOUS_ATOMIC
 #endif
 
+#cmakedefine QUDA_HETEROGENEOUS_ATOMIC_INF_INIT
+#ifdef QUDA_HETEROGENEOUS_ATOMIC_INF_INIT
+/**
+ * @def   HETEROGENEOUS_ATOMIC_INF_INIT
+ * @brief This macro sets whether we are using infinity for the signaling sentinal
+ */
+#define HETEROGENEOUS_ATOMIC_INF_INIT
+#undef QUDA_HETEROGENEOUS_ATOMIC_INF_INIT
+#endif
+
 #cmakedefine QUDA_LARGE_KERNEL_ARG
 
 #cmakedefine QUDA_DIRAC_CLOVER_HASENBUSCH
