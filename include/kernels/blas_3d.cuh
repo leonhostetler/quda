@@ -6,6 +6,7 @@
 #include <quda_matrix.h>
 #include <matrix_field.h>
 #include <constant_kernel_arg.h>
+#include <reduce_helper.h>
 #include <kernel.h>
 
 namespace quda
