@@ -166,9 +166,10 @@ std::vector<double> eigensolve(test_t test_param)
   eig_param.use_smeared_gauge = gauge_smear;
 
   if (dslash_type == QUDA_LAPLACE_DSLASH) {
-    eig_inv_param.kappa = 1.0 / ((laplace3D == 3 ? 6 : 8) + mass);
+    int dimension = laplace3D < 4 ? 3 : 4;
+    eig_inv_param.kappa = 1.0 / (2 * dimension + mass);
     eig_inv_param.laplace3D = laplace3D;
-    if (laplace3D == 3) {
+    if (dimension == 3) {
       eig_param.ortho_dim = laplace3D;
       eig_param.ortho_dim_size_local = tdim;
     }

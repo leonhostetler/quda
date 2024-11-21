@@ -179,7 +179,8 @@ void stag_mat(ColorSpinorField &out, const GaugeField &fat_link, const GaugeFiel
   stag_dslash(out.Odd(), fat_link, long_link, in.Even(), QUDA_ODD_PARITY, 1 - daggerBit, dslash_type, laplace3D);
 
   if (dslash_type == QUDA_LAPLACE_DSLASH) {
-    double kappa = 1.0 / ((laplace3D < 4 ? 6 : 8) + mass);
+    int dimension = laplace3D < 4 ? 3 : 4;
+    double kappa = 1.0 / (2 * dimension + mass);
     xpay(in.data(), kappa, out.data(), out.Length(), out.Precision());
   } else {
     axpy(2 * mass, in.data(), out.data(), out.Length(), out.Precision());
