@@ -29,6 +29,7 @@ namespace quda
     ortho_dim_size = eig_param->ortho_dim_size_local;
     if (ortho_dim != 3)
       errorQuda("Only 3D spatial splitting (ortho_dim = 3) is supported, ortho_dim passed = %d", ortho_dim);
+    verbose_rank = comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0;
 
     // Tridiagonal/Arrow matrices
     alpha_3D.resize(ortho_dim_size);
@@ -200,7 +201,7 @@ namespace quda
           if (num_keep_3D[t] < min_nkeep) min_nkeep = num_keep_3D[t];
 
           // Use printf to get data from t dim only
-          if (getVerbosity() >= QUDA_DEBUG_VERBOSE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
+          if (getVerbosity() >= QUDA_DEBUG_VERBOSE && verbose_rank) {
             printf("%04d converged eigenvalues for timeslice %d at restart iter %04d\n", num_converged_3D[t],
                    t_offset + t, restart_iter + 1);
             printf("iter Conv[%d] = %d\n", t_offset + t, iter_converged_3D[t]);
@@ -226,7 +227,7 @@ namespace quda
         }
       }
 
-      if (getVerbosity() >= QUDA_VERBOSE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
+      if (getVerbosity() >= QUDA_VERBOSE && verbose_rank) {
         std::stringstream converged;
         std::copy(converged_3D.begin(), converged_3D.end(), std::ostream_iterator<int>(converged, ""));
         printf("iter = %d rank = %d converged = %s min nlock %3d nconv %3d nkeep %3d\n", restart_iter + 1,
@@ -258,17 +259,21 @@ namespace quda
         computeEvals(kSpace, evals);
       }
     } else {
-      if (getVerbosity() >= QUDA_SUMMARIZE && comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
-        printf("TRLM (rank = %d) computed the requested %d vectors in %d restart steps and %d OP*x operations\n",
-               comm_rank_global(), n_conv, restart_iter, iter);
-      }
+      if (verbose_rank) {
+        if (getVerbosity() >= QUDA_SUMMARIZE) {
+          printf("TRLM (rank = %d) computed the requested %d vectors in %d restart steps and %d OP*x operations\n",
+                 comm_rank_global(), n_conv, restart_iter, iter);
+        }
 
-      // Dump all Ritz values and residua if using Chebyshev
-      if (eig_param->use_poly_acc) {
-        for (int t = 0; t < ortho_dim_size; t++) {
-          for (int i = 0; i < n_conv; i++) {
-            logQuda(QUDA_VERBOSE, "RitzValue[%d][%04d]: (%+.16e, %+.16e) residual %.16e\n", t, i, alpha_3D[t][i], 0.0,
-                    residua_3D[t][i]);
+        if (getVerbosity() >= QUDA_VERBOSE) {
+          // Dump all Ritz values and residua if using Chebyshev
+          if (eig_param->use_poly_acc) {
+            for (int t = 0; t < ortho_dim_size; t++) {
+              for (int i = 0; i < n_conv; i++) {
+                printf("RitzValue[%d][%04d]: (%+.16e, %+.16e) residual %.16e\n", t, i, alpha_3D[t][i], 0.0,
+                       residua_3D[t][i]);
+              }
+            }
           }
         }
       }
@@ -600,7 +605,8 @@ namespace quda
 
     auto result = *std::max_element(inner_products.begin(), inner_products.end());
     comm_allreduce_max(result);
-    logQuda(QUDA_VERBOSE, "Chebyshev max %e\n", result);
+    if (verbose_rank && getVerbosity() >= QUDA_VERBOSE)
+      printf("Chebyshev max = %e (rank = %d)\n", result, comm_rank_global());
 
     // Increase final result by 10% for safety
     return result * 1.10;
@@ -642,7 +648,7 @@ namespace quda
     if (size == n_conv) {
       evals.resize(ortho_dim_size * comm_dim_global(ortho_dim) * n_conv, 0.0);
 
-      if (comm_coord(0) == 0 && comm_coord(1) == 0 && comm_coord(2) == 0) {
+      if (verbose_rank) {
         int t_offset = ortho_dim_size * comm_coord_global(3);
         for (int t = 0; t < ortho_dim_size; t++) {
           for (int i = 0; i < size; i++) {
