@@ -2403,10 +2403,9 @@ void checkClover(QudaInvertParam *param) {
   if (cloverEigensolver == nullptr) errorQuda("Eigensolver clover field doesn't exist");
 }
 
-quda::GaugeField *checkGauge(QudaInvertParam *param, bool use_smeared_gauge = false)
+quda::GaugeField *checkGauge(QudaInvertParam *param)
 {
   quda::GaugeField *U = param->dslash_type == QUDA_ASQTAD_DSLASH ? gaugeFatPrecise :
-    use_smeared_gauge                                            ? gaugeSmeared :
                                                                    gaugePrecise;
 
   if (U == nullptr)
@@ -2416,7 +2415,7 @@ quda::GaugeField *checkGauge(QudaInvertParam *param, bool use_smeared_gauge = fa
     errorQuda("Solve precision %d doesn't match gauge precision %d", param->cuda_prec, U->Precision());
   }
 
-  if (param->dslash_type != QUDA_ASQTAD_DSLASH && !use_smeared_gauge) {
+  if (param->dslash_type != QUDA_ASQTAD_DSLASH) {
     if (param->cuda_prec_sloppy != gaugeSloppy->Precision()
         || param->cuda_prec_precondition != gaugePrecondition->Precision()
         || param->cuda_prec_refinement_sloppy != gaugeRefinement->Precision()
@@ -2434,7 +2433,7 @@ quda::GaugeField *checkGauge(QudaInvertParam *param, bool use_smeared_gauge = fa
     if (gaugeRefinement == nullptr) errorQuda("Refinement gauge field doesn't exist");
     if (gaugeEigensolver == nullptr) errorQuda("Refinement gauge field doesn't exist");
     if (param->overlap && gaugeExtended == nullptr) errorQuda("Extended gauge field doesn't exist");
-  } else if (!use_smeared_gauge) {
+  } else {
     if (gaugeLongPrecise == nullptr) errorQuda("Precise gauge long field doesn't exist");
 
     if (param->cuda_prec_sloppy != gaugeFatSloppy->Precision()
@@ -2565,7 +2564,7 @@ void eigensolveQuda(void **host_evecs, double _Complex *host_evals, QudaEigParam
   checkEigParam(eig_param);
 
   // Check that the gauge field is valid
-  GaugeField *cudaGauge = checkGauge(inv_param, eig_param->use_smeared_gauge);
+  GaugeField *cudaGauge = checkGauge(inv_param);
 
   // Set iter statistics to zero
   inv_param->iter = 0;
