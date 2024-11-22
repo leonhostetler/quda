@@ -1,11 +1,9 @@
 #include <color_spinor_field.h>
-#include <contract_quda.h>
-
+#include <kernels/blas_3d.cuh>
 #include <tunable_nd.h>
 #include <tunable_reduction.h>
-#include <instantiate.h>
-#include <kernels/blas_3d.cuh>
 #include <blas_3d.h>
+#include <instantiate.h>
 
 namespace quda
 {

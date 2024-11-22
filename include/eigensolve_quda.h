@@ -454,6 +454,8 @@ namespace quda
   */
   class TRLM3D : public EigenSolver
   {
+    bool verbose_rank = false; /** Whether this rank is one that logs */
+
   public:
     /**
        @brief Constructor for Thick Restarted Eigensolver class

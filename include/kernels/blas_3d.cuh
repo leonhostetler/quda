@@ -5,6 +5,8 @@
 #include <fast_intdiv.h>
 #include <quda_matrix.h>
 #include <matrix_field.h>
+#include <constant_kernel_arg.h>
+#include <reduce_helper.h>
 #include <kernel.h>
 
 namespace quda
@@ -118,7 +120,7 @@ namespace quda
     // Create a typename F for the ColorSpinorFields
     typedef typename colorspinor_mapper<Float, nSpin, nColor, spin_project, spinor_direct_load, disable_ghost>::type F;
 
-    static constexpr int MAX_ORTHO_DIM = 128;
+    static constexpr int MAX_ORTHO_DIM = 256;
     real a[MAX_ORTHO_DIM];
     const F x;
     real b[MAX_ORTHO_DIM];
@@ -173,7 +175,7 @@ namespace quda
     // Create a typename F for the ColorSpinorFields
     typedef typename colorspinor_mapper<Float, nSpin, nColor, spin_project, spinor_direct_load, disable_ghost>::type F;
 
-    static constexpr int MAX_ORTHO_DIM = 64;
+    static constexpr int MAX_ORTHO_DIM = 256;
     complex<real> a[MAX_ORTHO_DIM];
     const F x;
     complex<real> b[MAX_ORTHO_DIM];

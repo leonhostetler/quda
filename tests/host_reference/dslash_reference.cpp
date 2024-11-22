@@ -859,10 +859,7 @@ double verifyStaggeredTypeEigenvector(quda::ColorSpinorField &spinor, const std:
     else
       sol_type = QUDA_MATDAG_MAT_SOLUTION;
   } else {
-    if (use_pc)
-      sol_type = QUDA_MATPC_SOLUTION;
-    else
-      sol_type = QUDA_MAT_SOLUTION;
+    sol_type = use_pc ? QUDA_MATPC_SOLUTION : QUDA_MAT_SOLUTION;
   }
 
   // Create temporary spinors
@@ -884,30 +881,38 @@ double verifyStaggeredTypeEigenvector(quda::ColorSpinorField &spinor, const std:
   }
 
   if (laplace3D == 3) {
-    int t_offset = spinor.X()[3] * comm_coord(3);
-    std::vector<double> nrm2(spinor.X()[3], 0.0);
-    std::vector<double> src2(spinor.X()[3], 0.0);
+    auto batch_size = (spinor.VolumeCB() / spinor.X()[3]) * stag_spinor_site_size;
+    auto t_offset = spinor.X()[3] * comm_coord(3);
+    std::vector<double> nrm2(spinor.X()[3] * comm_dim(3), 0.0);
+    std::vector<double> src2(spinor.X()[3] * comm_dim(3), 0.0);
     // Compute M * x - \lambda * x on each slice
     for (auto t = 0; t < spinor.X()[3]; t++) {
       auto t_global = t_offset + t;
-      auto batch_size = (spinor.VolumeCB() / spinor.X()[3]) * stag_spinor_site_size;
       auto offset = t * batch_size * inv_param.cpu_prec;
 
       for (int parity = 0; parity < spinor.SiteSubset(); parity++) {
         caxpy(-lambda[t_global], static_cast<char *>(spinor.data()) + offset, static_cast<char *>(ref.data()) + offset,
               batch_size, inv_param.cpu_prec);
 
-        nrm2[t] += norm_2(static_cast<char *>(ref.data()) + offset, batch_size, inv_param.cpu_prec, false);
-        src2[t] += norm_2(static_cast<char *>(spinor.data()) + offset, batch_size, inv_param.cpu_prec, false);
+        nrm2[t_global] += norm_2(static_cast<char *>(ref.data()) + offset, batch_size, inv_param.cpu_prec, false);
+        src2[t_global] += norm_2(static_cast<char *>(spinor.data()) + offset, batch_size, inv_param.cpu_prec, false);
 
         offset += spinor.VolumeCB() * stag_spinor_site_size * inv_param.cpu_prec;
       }
-
-      auto l = ((double *)&(lambda[t_global]))[0];
-      printfQuda("Eigenvector %4d, t = %d lambda = %15.14e: tol %.2e, host residual = %.15e\n", i, t_global, l,
-                 eig_param.tol, sqrt(nrm2[t] / src2[t]));
     }
-    return sqrt(nrm2[0] / src2[0]);
+
+    comm_allreduce_sum(nrm2);
+    comm_allreduce_sum(src2);
+
+    for (auto t = 0; t < spinor.X()[3] * comm_dim(3); t++) {
+      auto l = ((double *)&(lambda[t]))[0];
+      printfQuda("Eigenvector %4d, t = %d lambda = %15.14e: tol %.2e, host residual = %.15e\n", i, t, l, eig_param.tol,
+                 sqrt(nrm2[t] / src2[t]));
+    }
+    auto total_nrm2 = std::accumulate(nrm2.begin(), nrm2.end(), 0);
+    auto total_src2 = std::accumulate(src2.begin(), src2.end(), 0);
+
+    return sqrt(total_nrm2 / total_src2);
   } else {
     // Compute M * x - \lambda * x
     caxpy(-lambda[0], spinor.data(), ref.data(), spinor.Volume() * stag_spinor_site_size, inv_param.cpu_prec);
