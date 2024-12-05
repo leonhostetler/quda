@@ -17,7 +17,7 @@ using count_t = cuda::atomic<unsigned int, cuda::thread_scope_device>;
 namespace quda
 {
 
-// By default we use negative infinity as the sentinal for testing for
+// By default we use negative infinity as the sentinel for testing for
 // reduction completion.  On some compilers we may need to use finite
 // numbers, so the alternative approach uses negative zero (set with CMake
 // option QUDA_HETEROGENEOUS_ATOMIC_INF_INIT).
@@ -34,7 +34,7 @@ namespace quda
   template <typename T> constexpr T terminate_value() { return cuda::std::numeric_limits<T>::infinity(); }
 
   /**
-     @brief Test if the result is complete (e.g., is not equal to the sentinal)
+     @brief Test if the result is complete (e.g., is not equal to the sentinel)
    */
   template <class T> bool is_complete(const T &result) { return result != init_value<T>(); }
 #else
@@ -50,7 +50,7 @@ namespace quda
   template <typename T> constexpr T terminate_value() { return static_cast<T>(0.0); }
 
   /**
-     @brief Test if the result is complete (e.g., is not equal to the sentinal)
+     @brief Test if the result is complete (e.g., is not equal to the sentinel)
    */
   template <class T> bool is_complete(const T &result) { return !(result == static_cast<T>(0.0) && std::signbit(result)); }
 #endif
