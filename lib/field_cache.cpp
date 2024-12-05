@@ -44,7 +44,7 @@ namespace quda {
     if (it != cache.end() && it->second.size()) { // found an entry
       tmp = std::move(it->second.top());
       it->second.pop(); // pop the defunct object
-    } else { // no entry found, we must allocate a new field
+    } else {            // no entry found, we must allocate a new field
       param.create = QUDA_ZERO_FIELD_CREATE;
       tmp = T(param);
     }

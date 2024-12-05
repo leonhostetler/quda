@@ -154,5 +154,4 @@ namespace quda {
     for (auto i = 0u; i < a.size(); i++) tmp.push_back(std::move(getFieldTmp(a[i])));
     return tmp;
   }
-
 }

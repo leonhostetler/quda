@@ -52,7 +52,10 @@ namespace quda
   /**
      @brief Test if the result is complete (e.g., is not equal to the sentinel)
    */
-  template <class T> bool is_complete(const T &result) { return !(result == static_cast<T>(0.0) && std::signbit(result)); }
+  template <class T> bool is_complete(const T &result)
+  {
+    return !(result == static_cast<T>(0.0) && std::signbit(result));
+  }
 #endif
 
   // declaration of reduce function
