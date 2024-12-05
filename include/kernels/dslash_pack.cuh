@@ -165,6 +165,7 @@ namespace quda
 
       int idx = indexFromFaceIndex<nDim, pc, dim, nFace, 0>(ghost_idx, parity, arg);
       constexpr int proj_dir = dagger ? +1 : -1;
+#pragma unroll
       for (auto src = src_idx; src < src_idx + n_src_tile; src++) {
         Vector f = arg.in[src](idx + s * arg.dc.volume_4d_cb, spinor_parity);
         if (twist == 1) {
@@ -187,6 +188,7 @@ namespace quda
 
       int idx = indexFromFaceIndex<nDim, pc, dim, nFace, 1>(ghost_idx, parity, arg);
       constexpr int proj_dir = dagger ? -1 : +1;
+#pragma unroll
       for (auto src = src_idx; src < src_idx + n_src_tile; src++) {
         Vector f = arg.in[src](idx + s * arg.dc.volume_4d_cb, spinor_parity);
         if (twist == 1) {
@@ -226,15 +228,17 @@ namespace quda
 
     if (face_num == 0) { // backwards
       int idx = indexFromFaceIndexStaggered<4, QUDA_4D_PC, dim, nFace, 0>(ghost_idx, parity, arg);
-      for (auto s = 0; s < n_src_tile; s++) {
-        Vector f = arg.in[src_idx + s](idx, spinor_parity);
-        arg.halo_pack.Ghost(dim, 0, ghost_idx + (src_idx + s) * nFace * arg.dc.ghostFaceCB[dim], spinor_parity) = f;
+#pragma unroll
+      for (auto src = src_idx; src < src_idx + n_src_tile; src++) {
+        Vector f = arg.in[src](idx, spinor_parity);
+        arg.halo_pack.Ghost(dim, 0, ghost_idx + src * nFace * arg.dc.ghostFaceCB[dim], spinor_parity) = f;
       }
     } else { // forwards
       int idx = indexFromFaceIndexStaggered<4, QUDA_4D_PC, dim, nFace, 1>(ghost_idx, parity, arg);
-      for (auto s = 0; s < n_src_tile; s++) {
-        Vector f = arg.in[src_idx + s](idx, spinor_parity);
-        arg.halo_pack.Ghost(dim, 1, ghost_idx + (src_idx + s) * nFace * arg.dc.ghostFaceCB[dim], spinor_parity) = f;
+#pragma unroll
+      for (auto src = src_idx; src < src_idx + n_src_tile; src++) {
+        Vector f = arg.in[src](idx, spinor_parity);
+        arg.halo_pack.Ghost(dim, 1, ghost_idx + src * nFace * arg.dc.ghostFaceCB[dim], spinor_parity) = f;
       }
     }
   }
