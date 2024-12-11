@@ -226,6 +226,7 @@ namespace quda
     alloc = std::exchange(src.alloc, false);
     reference = std::exchange(src.reference, false);
     ghost_precision_allocated = std::exchange(src.ghost_precision_allocated, QUDA_INVALID_PRECISION);
+    nFace_allocated = std::exchange(src.nFace_allocated, 0);
     nColor = std::exchange(src.nColor, 0);
     nSpin = std::exchange(src.nSpin, 0);
     nVec = std::exchange(src.nVec, 0);
@@ -307,7 +308,7 @@ namespace quda
   void ColorSpinorField::createGhostZone(int nFace, bool spin_project) const
   {
     if (ghost_precision == QUDA_INVALID_PRECISION) errorQuda("Invalid requested ghost precision");
-    if (ghost_precision_allocated == ghost_precision) return;
+    if (ghost_precision_allocated == ghost_precision && nFace_allocated == nFace) return;
 
     bool is_fixed = (ghost_precision == QUDA_HALF_PRECISION || ghost_precision == QUDA_QUARTER_PRECISION);
     int nSpinGhost = (nSpin == 4 && spin_project) ? 2 : nSpin;
@@ -401,6 +402,7 @@ namespace quda
       dc.dims[3][2] = X[2];
     }
     ghost_precision_allocated = ghost_precision;
+    nFace_allocated = nFace;
   } // createGhostZone
 
   void ColorSpinorField::zero() { qudaMemsetAsync(v, 0, bytes, device::get_default_stream()); }

@@ -315,6 +315,9 @@ namespace quda
     /** Used to keep local track of allocated ghost_precision in createGhostZone */
     mutable QudaPrecision ghost_precision_allocated = QUDA_INVALID_PRECISION;
 
+    /** Used to keep local track of allocated nFace in createGhostZone */
+    mutable int nFace_allocated = 0;
+
     int nColor = 0;
     int nSpin = 0;
     int nVec = 0;
