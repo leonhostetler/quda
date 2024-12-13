@@ -220,8 +220,8 @@ namespace quda {
         }
 
         if (perform_svd) {
-          Matrix<complex<Float>,3> tmp2;
-	  // compute the eigenvalues using the singular value decomposition
+          Matrix<complex<Float>, 3> tmp2;
+          // compute the eigenvalues using the singular value decomposition
 	  computeSVD<Float>(q,tempq,tmp2,g);
 	  // The array g contains the eigenvalues of the matrix q
 	  // The determinant is the product of the eigenvalues, and I can use this

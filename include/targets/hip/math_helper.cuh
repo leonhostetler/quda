@@ -20,6 +20,7 @@ namespace quda
   template <typename T> inline __host__ __device__ T acos(const T a) { return ::acos(a); }
   template <typename T> inline __host__ __device__ T pow(const T a, const int b) { return ::pow(a, b); }
   template <typename T> inline __host__ __device__ T pow(const T a, const T b) { return ::pow(a, b); }
+  template <typename T> inline __host__ __device__ T fmod(const T a, const T b) { return ::fmod(a, b); }
 
   /**
    * @brief Maximum of two numbers

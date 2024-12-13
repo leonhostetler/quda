@@ -72,7 +72,7 @@ namespace quda
     /**
        @brief Constructor for SharedMemory object.
     */
-    __device__ __host__ constexpr SharedMemory() : data(cache(get_offset(target::block_dim()))) { }
+    constexpr SharedMemory() : data(cache(get_offset(target::block_dim()))) { }
 
     /**
        @brief Constructor for SharedMemory object.

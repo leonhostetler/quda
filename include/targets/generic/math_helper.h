@@ -24,6 +24,7 @@ namespace quda
   template <typename T> inline T pow(const T a, const T b) { return ::pow(a, b); }
   template <typename T> inline T pow(const T a, const int b) { return ::pow(a, b); }
   template <typename T> inline T fpow(const T a, const int b) { return ::pow(a, b); }
+  template <typename T> inline T fmod(const T a, const T b) { return ::fmod(a, b); }
   inline float fdividef(const float a, const float b) { return a / b; }
 
 } // namespace quda
