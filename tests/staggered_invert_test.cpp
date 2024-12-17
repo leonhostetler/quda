@@ -562,9 +562,10 @@ int main(int argc, char **argv)
     if (quda::comm_rank() != 0) { delete listeners.Release(listeners.default_result_printer()); }
     result = RUN_ALL_TESTS();
   } else {
-    solve(test_t {inv_type, solution_type, solve_type, prec_sloppy, multishift, solution_accumulator_pipeline,
-                  schwarz_t {precon_schwarz_type, inv_multigrid ? QUDA_MG_INVERTER : precon_type, prec_precondition},
-                  inv_param.residual_type});
+    for (int rep = 0; rep < nrepeat; rep++)
+      solve(test_t {inv_type, solution_type, solve_type, prec_sloppy, multishift, solution_accumulator_pipeline,
+                    schwarz_t {precon_schwarz_type, inv_multigrid ? QUDA_MG_INVERTER : precon_type, prec_precondition},
+                    inv_param.residual_type});
   }
 
   cleanup();
