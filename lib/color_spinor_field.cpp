@@ -308,7 +308,8 @@ namespace quda
   void ColorSpinorField::createGhostZone(int nFace, bool spin_project) const
   {
     if (ghost_precision == QUDA_INVALID_PRECISION) errorQuda("Invalid requested ghost precision");
-    if (ghost_precision_allocated == ghost_precision && nFace_allocated == nFace) return;
+    if (ghost_precision_allocated == ghost_precision && nFace_allocated == nFace &&
+        spin_project_allocated == spin_project) return;
 
     bool is_fixed = (ghost_precision == QUDA_HALF_PRECISION || ghost_precision == QUDA_QUARTER_PRECISION);
     int nSpinGhost = (nSpin == 4 && spin_project) ? 2 : nSpin;
@@ -401,6 +402,8 @@ namespace quda
       dc.dims[3][1] = X[1];
       dc.dims[3][2] = X[2];
     }
+
+    spin_project_allocated = spin_project;
     ghost_precision_allocated = ghost_precision;
     nFace_allocated = nFace;
   } // createGhostZone
