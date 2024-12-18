@@ -774,9 +774,12 @@ namespace quda
     /**
       @brief Create a dummy field used for batched communication
       @param[in] v Vector of fields we which to batch together
+      @param[in] nFace The depth of the face in each dimension and direction
+      @param[in] nFace The depth of the face in each dimension and direction
+      @param[in] spin_project Whether we are spin projecting
       @return Dummy (nDim+1)-dimensional field
      */
-    static FieldTmp<ColorSpinorField> create_comms_batch(cvector_ref<const ColorSpinorField> &v);
+    static FieldTmp<ColorSpinorField> create_comms_batch(cvector_ref<const ColorSpinorField> &v, int nFace = 1, bool spin_project = true);
 
     /**
        @brief Create a field that aliases this field's storage.  The
