@@ -843,12 +843,12 @@ namespace quda
     FieldKey<ColorSpinorField> key;
     key.volume = v.VolString();
     key.aux = v.AuxString();
-    char aux[32];
+    char aux[48];
     strcpy(aux, ",nFace=");
     u32toa(aux + 7, nFace);
     strcpy(aux + 8, ",ghost_batch=");
     u32toa(aux + 21, v.size());
-    if (spin_project && v.Nspin() > 1) strcat(aux, "spin_project");
+    if (spin_project && v.Nspin() > 1) strcat(aux, ",spin_project");
     key.aux += aux;
 
     return FieldTmp<ColorSpinorField>(key, param);
