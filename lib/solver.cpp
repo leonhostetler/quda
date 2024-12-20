@@ -283,7 +283,7 @@ namespace quda {
 
         if ((!space->svd && param.eig_param.n_conv != (int)space->evecs.size())
             || (space->svd && 2 * param.eig_param.n_conv != (int)space->evecs.size()))
-          errorQuda("Preserved deflation space size %lu does not match expected %d", space->evecs.size(),
+          warningQuda("Preserved deflation space size %lu does not match expected %d", space->evecs.size(),
                     param.eig_param.n_conv);
 
         // move vectors from preserved space to local space

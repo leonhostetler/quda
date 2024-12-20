@@ -49,6 +49,10 @@ extern "C" {
                         HISQ fermions since the tadpole factor is
                         baked into the links during their construction */
     double naik_epsilon; /** Naik epsilon parameter (HISQ fermions only).*/
+
+    QudaEigParam eig_param; /** To pass deflation-related stuff like eigenvector filename **/
+    double tol_restart;
+    QudaPrecision prec_eigensolver;
   } QudaInvertArgs_t;
 
   /**
@@ -162,6 +166,11 @@ extern "C" {
    * @param[in] layout Struct defining local dimensions and machine topology
    */
   void qudaSetLayout(QudaLayout_t layout);
+
+  /**
+   * Clean up the QUDA deflation space.
+   */
+  void qudaCleanUpDeflationSpace();
 
   /**
    * Destroy the QUDA context.

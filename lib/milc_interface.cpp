@@ -61,6 +61,8 @@ static bool invalidate_quda_mg = true;
 
 static void *df_preconditioner = nullptr;
 
+static void *preserved_deflation_space = nullptr;
+
 using namespace quda;
 using namespace quda::fermion_force;
 
@@ -104,11 +106,25 @@ void qudaInit(QudaInitArgs_t input)
   qudamilc_called<false>(__func__, QUDA_SUMMARIZE);
 }
 
+void qudaCleanUpDeflationSpace()
+{
+    qudamilc_called<true>(__func__);
+    if (preserved_deflation_space) {
+
+	deflation_space *space = reinterpret_cast<deflation_space *>(preserved_deflation_space);
+        logQuda(QUDA_VERBOSE, "Cleaning up deflation space of size %lu\n", space->evecs.size());
+	space->evecs.clear();
+        space->evals.clear();
+	delete space;
+    }
+    qudamilc_called<false>(__func__);
+}
+
 void qudaFinalize()
 {
-  qudamilc_called<true>(__func__);
+  qudamilc_called<true>(__func__, QUDA_VERBOSE);
   endQuda();
-  qudamilc_called<false>(__func__);
+  qudamilc_called<false>(__func__, QUDA_VERBOSE);
 }
 #if defined(MULTI_GPU) && !defined(QMP_COMMS)
 /**
@@ -1188,6 +1204,22 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
   setInvertParams(host_precision, device_precision, device_precision_sloppy, mass, target_residual,
                   target_fermilab_residual, inv_args.max_iter, reliable_delta, local_parity, verbosity,
                   QUDA_CG_INVERTER, &invertParam);
+ 
+  // Deflation for even parity solves when desired 
+  invertParam.eig_param = (local_parity == QUDA_EVEN_PARITY)&&(inv_args.eig_param.n_ev_deflate>0) ? &inv_args.eig_param : nullptr;
+  invertParam.tol_restart = inv_args.tol_restart;
+
+  // Eigensolver precision
+  invertParam.cuda_prec_eigensolver = inv_args.prec_eigensolver;
+
+  // Preserve deflation space
+  static bool deflation_init = false;
+  if (invertParam.eig_param && inv_args.eig_param.preserve_deflation) {
+    if (deflation_init) {
+      if (!preserved_deflation_space) errorQuda("Unexpected nullptr for preserved deflation space");
+      inv_args.eig_param.preserve_deflation_space = preserved_deflation_space;
+    }
+  }
 
   ColorSpinorParam csParam;
   setColorSpinorParams(localDim, host_precision, &csParam);
@@ -1206,6 +1238,11 @@ void qudaInvert(int external_precision, int quda_precision, double mass, QudaInv
   int quark_offset = getColorVectorOffset(local_parity, false, localDim) * host_precision;
 
   invertQuda(static_cast<char *>(solution) + quark_offset, static_cast<char *>(source) + quark_offset, &invertParam);
+
+  if (invertParam.eig_param && inv_args.eig_param.preserve_deflation) {
+    preserved_deflation_space = inv_args.eig_param.preserve_deflation_space;
+    deflation_init = true; // signal that we have deflation space preserved
+  }
 
   // return the number of iterations taken by the inverter
   *num_iters = invertParam.iter;
