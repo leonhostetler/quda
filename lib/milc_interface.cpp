@@ -1435,6 +1435,22 @@ void qudaInvertMsrc(int external_precision, int quda_precision, double mass, Qud
                   QUDA_CG_INVERTER, &invertParam);
   invertParam.num_src = num_src;
 
+  // Deflation for even parity solves when desired
+  invertParam.eig_param = (local_parity == QUDA_EVEN_PARITY)&&(inv_args.eig_param.n_ev_deflate>0) ? &inv_args.eig_param : nullptr;
+  invertParam.tol_restart = inv_args.tol_restart;
+
+  // Eigensolver precision
+  invertParam.cuda_prec_eigensolver = inv_args.prec_eigensolver;
+
+  // Preserve deflation space
+  static bool deflation_init = false;
+  if (invertParam.eig_param && inv_args.eig_param.preserve_deflation) {
+    if (deflation_init) {
+      if (!preserved_deflation_space) errorQuda("Unexpected nullptr for preserved deflation space");
+      inv_args.eig_param.preserve_deflation_space = preserved_deflation_space;
+    }
+  }
+
   ColorSpinorParam csParam;
   setColorSpinorParams(localDim, host_precision, &csParam);
 
@@ -1460,6 +1476,11 @@ void qudaInvertMsrc(int external_precision, int quda_precision, double mass, Qud
 
   host_free(sln_pointer);
   host_free(src_pointer);
+
+  if (invertParam.eig_param && inv_args.eig_param.preserve_deflation) {
+    preserved_deflation_space = inv_args.eig_param.preserve_deflation_space;
+    deflation_init = true; // signal that we have deflation space preserved
+  }
 
   // The conventions for num_iters, final_residual, and final_fermilab_residual are taken from the
   // convention in `generic_ks/d_congrad5_fn_milc.c` (commit 414fb31). Here, a block solve
